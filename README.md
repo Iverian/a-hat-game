@@ -1,16 +1,13 @@
 # hat_game
 
-A new Flutter project.
+Приложение-компаньон для "Шляпы".
 
-## Getting Started
+## Разработка
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Установите Flutter по инструкции из официальной [документации](https://docs.flutter.dev/get-started/install).
+2. Установите [Just](https://github.com/casey/just)
+3. Установите утилиты для кодогенерации gRPC кода (см. [документацию](https://grpc.io/docs/languages/dart/quickstart/)):
+   1. [Компилятор protoc](https://grpc.io/docs/protoc-installation/)
+   2. Плагин для генерации Dart кода:
+      1. Выполните команду `dart pub global activate protoc_plugin`
+      2. Добавьте в `PATH` путь к глобальным утилитам Dart `~/.pub-cache/bin` (`export PATH="$PATH:$HOME/.pub-cache/bin"`)
