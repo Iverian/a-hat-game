@@ -1,4 +1,10 @@
+import "dart:io";
+import "dart:isolate";
+
 import "package:flutter/material.dart";
+import "package:grpc/grpc.dart" as grpc;
+
+import "service.dart";
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +34,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({required this.title, super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -45,8 +51,35 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+class GameHost {
+  GameHost();
+
+  Future<void> serve() async {
+    await Isolate.spawn(
+      (_) async {
+        await grpc.Server([GameHostService()]).serve(
+          address: InternetAddress.anyIPv4,
+          port: 12345,
+        );
+      },
+      null,
+    );
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _counter;
+  GameHost _host;
+
+  _MyHomePageState()
+      : _counter = 0,
+        _host = GameHost();
+
+  @override
+  void initState() {
+    super.initState();
+    _host.serve();
+  }
 
   void _incrementCounter() {
     setState(() {

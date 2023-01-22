@@ -1,12 +1,11 @@
 syntax = "proto3";
 
+package gamehost;
 
 option java_multiple_files = true;
 option java_package = "org.govnoedi.hatgame.gamehost";
 option java_outer_classname = "GameHostProto";
 option objc_class_prefix = "GH";
-
-package gamehost;
 
 // The greeting service definition.
 service Greeter {
