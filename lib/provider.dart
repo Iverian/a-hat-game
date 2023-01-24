@@ -27,6 +27,9 @@ final pNamePod = createPrefProvider<String>(
 
 final gamePod = ChangeNotifierProvider((ref) => GameStateNotifier());
 
+final gameIsActivePod =
+    StateProvider((ref) => ref.watch(gamePod.select((value) => value.isActive)));
+
 final serverPortPod = FutureProvider.autoDispose((_) async {
   RawServerSocket? socket;
   try {

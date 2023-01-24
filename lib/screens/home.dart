@@ -12,7 +12,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameIsActive = ref.watch(gamePod.select((value) => value.isActive));
+    final gameIsActive = ref.watch(gameIsActivePod);
 
     return Scaffold(
       body: Padding(

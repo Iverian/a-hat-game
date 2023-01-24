@@ -4,6 +4,10 @@
 default:
   @just --list
 
+# Format code
+fmt:
+  flutter format --line-length 100 --fix "{{ justfile_directory() }}/lib"
+
 # Generate gRPC code
 grpc-gen:
   #!/bin/sh
@@ -18,7 +22,7 @@ grpc-gen:
     protoc "--dart_out=grpc:${out_dir}" "-I${in_dir}" "${p}"
   done
 
-  flutter format --line-length 100 --fix lib/proto/*
+  flutter format --line-length 100 --fix "{{ justfile_directory() }}/lib/proto"
 
 grpc-hello addr="localhost":
   grpcurl -plaintext -proto protos/gamehost.proto -d '{"name": "hyu"}' {{ addr }}:12345 gamehost.Greeter/SayHello
