@@ -16,3 +16,16 @@
 6. Для отправки Ad-Hoc запросов на gRPC сервисы установите [gRPCCurl](https://github.com/fullstorydev/grpcurl) или Postman (см. [инструкцию](https://learn.microsoft.com/en-us/aspnet/core/grpc/test-tools?view=aspnetcore-7.0), часть про рефлексию смело игнорируйте: Dart-реализация gRPC ее не поддерживает).
 
 Для регенерации gRPC кода выполните just-сценарий `grpc-gen`: `just grpc-gen`.
+
+## Присоединение по ссылке
+
+Формат ссылки: `hatgame://join?h=1.2.3.3&p=9001`. Настройки:
+
+* Android -- [`AndroidManifest`](/android/app/src/main/AndroidManifest.xml);
+* iOS -- [`Info.plist`](/ios/Runner/Info.plist).
+
+Документация:
+
+* <https://docs.flutter.dev/development/ui/navigation/deep-linking>
+* <https://developer.android.com/training/app-links/deep-linking>
+* <https://medium.com/wolox/ios-deep-linking-url-scheme-vs-universal-links-50abd3802f97>

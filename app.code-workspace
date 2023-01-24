@@ -27,6 +27,7 @@
       "editor.wordBasedSuggestions": false
     },
     "java.configuration.updateBuildConfiguration": "interactive",
+    "dart.lineLength": 100,
   },
   "launch": {
     "version": "0.2.0",
@@ -45,7 +46,9 @@
       "redhat.vscode-yaml",
       "editorconfig.editorconfig",
       "skellock.just",
-      "zxh404.vscode-proto3"
+      "zxh404.vscode-proto3",
+      "gruntfuggly.todo-tree",
+      "redhat.vscode-xml"
     ]
   }
 }
