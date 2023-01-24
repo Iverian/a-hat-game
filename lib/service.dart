@@ -1,6 +1,6 @@
 import "package:grpc/src/server/call.dart";
 
-import 'proto/gamehost.pbgrpc.dart';
+import "generated/gamehost.pbgrpc.dart";
 
 class GameHostService extends GreeterServiceBase {
   @override
