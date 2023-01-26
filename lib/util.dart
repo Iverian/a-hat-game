@@ -1,12 +1,8 @@
-import 'package:flutter/material.dart';
+import "package:flutter/material.dart";
 
 final _emptyPattern = RegExp(r"^\s+$");
 final _whitespaceStartPattern = RegExp(r"^\s+");
 const _nameMaxLength = 31;
-
-Future<void> blockOn<T extends Object?>(Future<T> future) => Future(() async {
-      await future;
-    });
 
 Future<dynamic> navPush(BuildContext context, Widget Function(BuildContext) builder) =>
     Navigator.of(context).push(

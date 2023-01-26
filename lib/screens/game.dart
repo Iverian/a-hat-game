@@ -1,10 +1,8 @@
 import "package:flutter/material.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:go_router/go_router.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../game.dart";
 import "../provider.dart";
-import "home.dart";
 import "lobby.dart";
 
 // Родитель всех игровых экранов, определяет корректный экран динамически из игрового состояния

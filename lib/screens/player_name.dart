@@ -1,7 +1,7 @@
 import "dart:async";
 
 import "package:flutter/material.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../provider.dart";
 import "../util.dart";
@@ -9,7 +9,7 @@ import "../util.dart";
 class PlayerNameScreen extends ConsumerStatefulWidget {
   final Widget Function(BuildContext)? _next;
 
-  const PlayerNameScreen(this._next, {super.key});
+  const PlayerNameScreen({super.key, Widget Function(BuildContext)? next}) : _next = next;
 
   @override
   ConsumerState<PlayerNameScreen> createState() => _PlayerNameScreenState();

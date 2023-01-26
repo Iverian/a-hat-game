@@ -1,7 +1,7 @@
 import "dart:math";
 
 import "package:flutter/material.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../const.dart";
 import "../provider.dart";
@@ -43,7 +43,10 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                     if (!_formKey.currentState!.validate()) {
                       return;
                     }
-                    await ref.read(gamePod).createGame(_controller.text);
+                    await ref.read(gamePod).create(
+                          name: _controller.text,
+                          playerName: ref.read(pNamePod),
+                        );
                     await navReplace(context, (_) => const GameScreen());
                   },
                 )

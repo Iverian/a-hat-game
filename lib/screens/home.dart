@@ -1,10 +1,13 @@
 import "package:flutter/material.dart";
-import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../provider.dart";
 import "../util.dart";
+import "../widgets/logo.dart";
+import "../widgets/main_menu_item.dart";
 import "create_game.dart";
 import "game.dart";
+import "join_game.dart";
 import "player_name.dart";
 
 class HomePage extends ConsumerWidget {
@@ -20,14 +23,16 @@ class HomePage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildLogo(),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Logo(),
+            ),
             ...gameIsActive ? _gameActiveMenu(context, ref) : _gameInactiveMenu(context, ref),
             // TODO: добавить еще настроек, когда-нибудь...
-            _buildMenuItem(
-              context,
+            MainMenuItem(
               title: "ЗАДАТЬ ИМЯ",
-              onTap: () async => navPush(context, (_) => const PlayerNameScreen(null)),
-            )
+              onTap: () async => navPush(context, (_) => const PlayerNameScreen()),
+            ),
           ],
         ),
       ),
@@ -38,20 +43,31 @@ class HomePage extends ConsumerWidget {
     final nameIsEmpty = ref.watch(pNamePod.select((value) => value.isEmpty));
 
     return [
-      _buildMenuItem(
-        context,
+      MainMenuItem(
         title: "СОЗДАТЬ ИГРУ",
-        onTap: () async => navPush(context, (_) {
-          const widget = CreateGameScreen();
-          return nameIsEmpty ? PlayerNameScreen((_) => widget) : widget;
-        }),
+        onTap: () async => navPush(
+          context,
+          (_) {
+            const next = CreateGameScreen();
+            return nameIsEmpty ? PlayerNameScreen(next: (_) => next) : next;
+          },
+        ),
       ),
+      MainMenuItem(
+        title: "ПРИСОЕДИНИТЬСЯ К ИГРЕ",
+        onTap: () async => navPush(
+          context,
+          (_) {
+            const next = JoinGameScreen();
+            return nameIsEmpty ? PlayerNameScreen(next: (_) => next) : next;
+          },
+        ),
+      )
     ];
   }
 
   List<Widget> _gameActiveMenu(BuildContext context, WidgetRef ref) => [
-        _buildMenuItem(
-          context,
+        MainMenuItem(
           title: "ВЕРНУТЬСЯ К ИГРЕ",
           onTap: () async {
             if (Navigator.of(context).widget.pages.length > 1) {
@@ -61,32 +77,11 @@ class HomePage extends ConsumerWidget {
             }
           },
         ),
-        _buildMenuItem(
-          context,
+        MainMenuItem(
           title: "ВЫЙТИ ИЗ ИГРЫ",
           onTap: () async {
-            await ref.read(gamePod).exitGame();
+            await ref.read(gamePod).exit();
           },
         ),
       ];
-
-  static Widget _buildLogo() => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Text(
-          "ШЛЯПА!!!",
-          style: TextStyle(fontSize: 30),
-        ),
-      );
-
-  static Widget _buildMenuItem(
-    BuildContext context, {
-    required String title,
-    required void Function() onTap,
-  }) =>
-      Card(
-        child: ListTile(
-          title: Text(title),
-          onTap: onTap,
-        ),
-      );
 }
