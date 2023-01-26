@@ -26,7 +26,6 @@
       "editor.tabCompletion": "onlySnippets",
       "editor.wordBasedSuggestions": false
     },
-    "java.configuration.updateBuildConfiguration": "interactive",
     "dart.lineLength": 100,
   },
   "launch": {
@@ -43,6 +42,7 @@
   "extensions": {
     "recommendations": [
       "dart-code.dart-code",
+      "dart-code.flutter",
       "redhat.vscode-yaml",
       "editorconfig.editorconfig",
       "skellock.just",
