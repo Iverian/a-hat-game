@@ -18,22 +18,52 @@ class HomePage extends ConsumerWidget {
     final gameIsActive = ref.watch(gameIsActivePod);
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Logo(),
-            ),
-            ...gameIsActive ? _gameActiveMenu(context, ref) : _gameInactiveMenu(context, ref),
-            // TODO: добавить еще настроек, когда-нибудь...
-            MainMenuItem(
-              title: "ЗАДАТЬ ИМЯ",
-              onTap: () async => navPush(context, (_) => const PlayerNameScreen()),
-            ),
-          ],
+      body: Container(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        padding: EdgeInsets.zero,
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 200,
+              ),
+              const Logo(),
+              const SizedBox(
+                height: 100,
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 200,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ...gameIsActive
+                              ? _gameActiveMenu(context, ref)
+                              : _gameInactiveMenu(context, ref),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 7,
+                    ),
+                    // TODO: добавить еще настроек, когда-нибудь...
+                    MainMenuItem(
+                      title: "ЗАДАТЬ ИМЯ",
+                      onTap: () async => navPush(context, (_) => const PlayerNameScreen()),
+                    ),
+                    MainMenuItem(
+                      title: "МОИ ПЕРСОНАЖИ",
+                      onTap: () async => navPush(context, (_) => const PlayerNameScreen()),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -53,6 +83,9 @@ class HomePage extends ConsumerWidget {
           },
         ),
       ),
+      const SizedBox(
+        height: 7,
+      ),
       MainMenuItem(
         title: "ПРИСОЕДИНИТЬСЯ К ИГРЕ",
         onTap: () async => navPush(
@@ -62,7 +95,7 @@ class HomePage extends ConsumerWidget {
             return nameIsEmpty ? PlayerNameScreen(next: (_) => next) : next;
           },
         ),
-      )
+      ),
     ];
   }
 
@@ -76,6 +109,9 @@ class HomePage extends ConsumerWidget {
               await navPush(context, (_) => const GameScreen());
             }
           },
+        ),
+        const SizedBox(
+          height: 7,
         ),
         MainMenuItem(
           title: "ВЫЙТИ ИЗ ИГРЫ",

@@ -24,7 +24,10 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp.router(
         title: "Hat Game",
-        theme: ThemeData.light(),
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lime),
+        ),
         routerConfig: App.router(),
       );
 

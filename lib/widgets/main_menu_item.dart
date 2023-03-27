@@ -12,10 +12,22 @@ class MainMenuItem extends StatelessWidget {
         _onTap = onTap;
 
   @override
-  Widget build(BuildContext context) => Card(
-        child: ListTile(
-          title: Text(_title),
-          onTap: _onTap,
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+      fontSize: 16,
+      fontWeight: FontWeight.normal,
+    );
+    return Card(
+      color: Theme.of(context).colorScheme.primary,
+      child: ListTile(
+        title: Text(
+          _title,
+          style: style,
         ),
-      );
+        onTap: _onTap,
+      ),
+    );
+  }
 }
