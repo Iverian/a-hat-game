@@ -7,6 +7,7 @@ import "../widgets/logo.dart";
 import "../widgets/main_menu_item.dart";
 import "create_game.dart";
 import "game.dart";
+import "characters.dart";
 import "join_game.dart";
 import "player_name.dart";
 
@@ -57,7 +58,7 @@ class HomePage extends ConsumerWidget {
                     ),
                     MainMenuItem(
                       title: "МОИ ПЕРСОНАЖИ",
-                      onTap: () async => navPush(context, (_) => const PlayerNameScreen()),
+                      onTap: () async => navPush(context, (_) => CharactersPage()),
                     ),
                   ],
                 ),
