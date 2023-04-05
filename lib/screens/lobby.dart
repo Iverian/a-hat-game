@@ -18,9 +18,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             children: [
               const TabBarView(
                 children: [
-                  Text("1"),
-                  Text("2"),
-                  Text("3"),
+                  Icon(Icons.center_focus_weak_outlined, size: 350),
+                  Icon(Icons.co_present_rounded, size: 350),
+                  Icon(Icons.directions_car, size: 350),
                 ],
               ),
               Positioned(
