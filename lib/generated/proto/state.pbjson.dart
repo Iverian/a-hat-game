@@ -9,6 +9,19 @@ import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use playerStatusDescriptor instead')
+const PlayerStatus$json = {
+  '1': 'PlayerStatus',
+  '2': [
+    {'1': 'JOINING', '2': 0},
+    {'1': 'CONNECTED', '2': 1},
+    {'1': 'DISCONNECTED', '2': 2},
+  ],
+};
+
+/// Descriptor for `PlayerStatus`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List playerStatusDescriptor = $convert.base64Decode(
+    'CgxQbGF5ZXJTdGF0dXMSCwoHSk9JTklORxAAEg0KCUNPTk5FQ1RFRBABEhAKDERJU0NPTk5FQ1RFRBAC');
 @$core.Deprecated('Use turnEndReasonDescriptor instead')
 const TurnEndReason$json = {
   '1': 'TurnEndReason',
@@ -93,14 +106,14 @@ final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
 const Player$json = {
   '1': 'Player',
   '2': [
-    {'1': 'connected', '3': 1, '4': 1, '5': 8, '10': 'connected'},
+    {'1': 'status', '3': 1, '4': 1, '5': 14, '6': '.hat_game.state.PlayerStatus', '10': 'status'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
   ],
 };
 
 /// Descriptor for `Player`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List playerDescriptor = $convert.base64Decode(
-    'CgZQbGF5ZXISHAoJY29ubmVjdGVkGAEgASgIUgljb25uZWN0ZWQSEgoEbmFtZRgCIAEoCVIEbmFtZQ==');
+    'CgZQbGF5ZXISNAoGc3RhdHVzGAEgASgOMhwuaGF0X2dhbWUuc3RhdGUuUGxheWVyU3RhdHVzUgZzdGF0dXMSEgoEbmFtZRgCIAEoCVIEbmFtZQ==');
 @$core.Deprecated('Use settingsDescriptor instead')
 const Settings$json = {
   '1': 'Settings',
@@ -153,13 +166,13 @@ final $typed_data.Uint8List lobbyDescriptor = $convert.base64Decode(
 const PlayerLobbyState$json = {
   '1': 'PlayerLobbyState',
   '2': [
-    {'1': 'value', '3': 3, '4': 3, '5': 11, '6': '.hat_game.state.Character', '10': 'value'},
+    {'1': 'value', '3': 1, '4': 3, '5': 11, '6': '.hat_game.state.Character', '10': 'value'},
   ],
 };
 
 /// Descriptor for `PlayerLobbyState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List playerLobbyStateDescriptor = $convert.base64Decode(
-    'ChBQbGF5ZXJMb2JieVN0YXRlEi8KBXZhbHVlGAMgAygLMhkuaGF0X2dhbWUuc3RhdGUuQ2hhcmFjdGVyUgV2YWx1ZQ==');
+    'ChBQbGF5ZXJMb2JieVN0YXRlEi8KBXZhbHVlGAEgAygLMhkuaGF0X2dhbWUuc3RhdGUuQ2hhcmFjdGVyUgV2YWx1ZQ==');
 @$core.Deprecated('Use runningGameStateDescriptor instead')
 const RunningGameState$json = {
   '1': 'RunningGameState',
@@ -167,7 +180,7 @@ const RunningGameState$json = {
     {'1': 'teams', '3': 1, '4': 1, '5': 11, '6': '.hat_game.state.TeamList', '10': 'teams'},
     {
       '1': 'characters',
-      '3': 3,
+      '3': 2,
       '4': 3,
       '5': 11,
       '6': '.hat_game.state.RunningGameState.CharactersEntry',
@@ -175,7 +188,7 @@ const RunningGameState$json = {
     },
     {
       '1': 'round_points',
-      '3': 4,
+      '3': 3,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.RoundPoints',
@@ -197,7 +210,7 @@ const RunningGameState_CharactersEntry$json = {
 
 /// Descriptor for `RunningGameState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List runningGameStateDescriptor = $convert.base64Decode(
-    'ChBSdW5uaW5nR2FtZVN0YXRlEi4KBXRlYW1zGAEgASgLMhguaGF0X2dhbWUuc3RhdGUuVGVhbUxpc3RSBXRlYW1zElAKCmNoYXJhY3RlcnMYAyADKAsyMC5oYXRfZ2FtZS5zdGF0ZS5SdW5uaW5nR2FtZVN0YXRlLkNoYXJhY3RlcnNFbnRyeVIKY2hhcmFjdGVycxI+Cgxyb3VuZF9wb2ludHMYBCABKAsyGy5oYXRfZ2FtZS5zdGF0ZS5Sb3VuZFBvaW50c1ILcm91bmRQb2ludHMaWAoPQ2hhcmFjdGVyc0VudHJ5EhAKA2tleRgBIAEoBlIDa2V5Ei8KBXZhbHVlGAIgASgLMhkuaGF0X2dhbWUuc3RhdGUuQ2hhcmFjdGVyUgV2YWx1ZToCOAE=');
+    'ChBSdW5uaW5nR2FtZVN0YXRlEi4KBXRlYW1zGAEgASgLMhguaGF0X2dhbWUuc3RhdGUuVGVhbUxpc3RSBXRlYW1zElAKCmNoYXJhY3RlcnMYAiADKAsyMC5oYXRfZ2FtZS5zdGF0ZS5SdW5uaW5nR2FtZVN0YXRlLkNoYXJhY3RlcnNFbnRyeVIKY2hhcmFjdGVycxI+Cgxyb3VuZF9wb2ludHMYAyABKAsyGy5oYXRfZ2FtZS5zdGF0ZS5Sb3VuZFBvaW50c1ILcm91bmRQb2ludHMaWAoPQ2hhcmFjdGVyc0VudHJ5EhAKA2tleRgBIAEoBlIDa2V5Ei8KBXZhbHVlGAIgASgLMhkuaGF0X2dhbWUuc3RhdGUuQ2hhcmFjdGVyUgV2YWx1ZToCOAE=');
 @$core.Deprecated('Use roundPointsDescriptor instead')
 const RoundPoints$json = {
   '1': 'RoundPoints',
@@ -251,7 +264,7 @@ const PlayerPoints$json = {
   '2': [
     {
       '1': 'value',
-      '3': 4,
+      '3': 1,
       '4': 3,
       '5': 11,
       '6': '.hat_game.state.PlayerPoints.ValueEntry',
@@ -273,7 +286,7 @@ const PlayerPoints_ValueEntry$json = {
 
 /// Descriptor for `PlayerPoints`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List playerPointsDescriptor = $convert.base64Decode(
-    'CgxQbGF5ZXJQb2ludHMSPQoFdmFsdWUYBCADKAsyJy5oYXRfZ2FtZS5zdGF0ZS5QbGF5ZXJQb2ludHMuVmFsdWVFbnRyeVIFdmFsdWUaWQoKVmFsdWVFbnRyeRIQCgNrZXkYASABKAdSA2tleRI1CgV2YWx1ZRgCIAEoCzIfLmhhdF9nYW1lLnN0YXRlLkNoYXJhY3RlcklkTGlzdFIFdmFsdWU6AjgB');
+    'CgxQbGF5ZXJQb2ludHMSPQoFdmFsdWUYASADKAsyJy5oYXRfZ2FtZS5zdGF0ZS5QbGF5ZXJQb2ludHMuVmFsdWVFbnRyeVIFdmFsdWUaWQoKVmFsdWVFbnRyeRIQCgNrZXkYASABKAdSA2tleRI1CgV2YWx1ZRgCIAEoCzIfLmhhdF9nYW1lLnN0YXRlLkNoYXJhY3RlcklkTGlzdFIFdmFsdWU6AjgB');
 @$core.Deprecated('Use characterIdListDescriptor instead')
 const CharacterIdList$json = {
   '1': 'CharacterIdList',
@@ -744,13 +757,13 @@ final $typed_data.Uint8List doPlayerConnectedDescriptor =
 const DoPrepareStart$json = {
   '1': 'DoPrepareStart',
   '2': [
-    {'1': 'teams', '3': 2, '4': 1, '5': 11, '6': '.hat_game.state.TeamList', '10': 'teams'},
+    {'1': 'teams', '3': 1, '4': 1, '5': 11, '6': '.hat_game.state.TeamList', '10': 'teams'},
   ],
 };
 
 /// Descriptor for `DoPrepareStart`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List doPrepareStartDescriptor = $convert.base64Decode(
-    'Cg5Eb1ByZXBhcmVTdGFydBIuCgV0ZWFtcxgCIAEoCzIYLmhhdF9nYW1lLnN0YXRlLlRlYW1MaXN0UgV0ZWFtcw==');
+    'Cg5Eb1ByZXBhcmVTdGFydBIuCgV0ZWFtcxgBIAEoCzIYLmhhdF9nYW1lLnN0YXRlLlRlYW1MaXN0UgV0ZWFtcw==');
 @$core.Deprecated('Use doPauseDescriptor instead')
 const DoPause$json = {
   '1': 'DoPause',

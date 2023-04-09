@@ -9,6 +9,26 @@
 import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+class PlayerStatus extends $pb.ProtobufEnum {
+  static const PlayerStatus JOINING =
+      PlayerStatus._(0, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'JOINING');
+  static const PlayerStatus CONNECTED =
+      PlayerStatus._(1, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'CONNECTED');
+  static const PlayerStatus DISCONNECTED = PlayerStatus._(
+      2, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'DISCONNECTED');
+
+  static const $core.List<PlayerStatus> values = <PlayerStatus>[
+    JOINING,
+    CONNECTED,
+    DISCONNECTED,
+  ];
+
+  static final $core.Map<$core.int, PlayerStatus> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static PlayerStatus? valueOf($core.int value) => _byValue[value];
+
+  const PlayerStatus._($core.int v, $core.String n) : super(v, n);
+}
+
 class TurnEndReason extends $pb.ProtobufEnum {
   static const TurnEndReason TIMEOUT =
       TurnEndReason._(0, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'TIMEOUT');

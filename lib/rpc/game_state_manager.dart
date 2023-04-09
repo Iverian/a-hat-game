@@ -30,7 +30,8 @@ class GameStateManager {
     result.state
       ..id = id
       ..rev = kFirstRev
-      ..players[hostId] = Player(connected: true, name: playerName)
+      // TODO: handle connection status
+      ..players[hostId] = Player(status: PlayerStatus.CONNECTED, name: playerName)
       ..hostId = hostId
       ..settings = settings
       ..clearStage()
@@ -63,40 +64,38 @@ class GameStateManager {
 
   Tuple2<int, UpdateState> updateLobbyJoin(String playerName) {
     final playerId = _generatePlayerId();
-    final patch = _makeUpdate(confirm: false)
-      ..clearAction()
-      ..playerJoined = DoPlayerJoined(
-        playerId: playerId,
-        player: Player(connected: true, name: playerName),
+    return Tuple2(
+      playerId,
+      _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..playerJoined = DoPlayerJoined(
+            playerId: playerId,
+            // TODO: handle connection status
+            player: Player(status: PlayerStatus.CONNECTED, name: playerName),
+          ),
+      ),
+    );
+  }
+
+  UpdateState updateLobbyLeave(int playerId) => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..playerLeft = DoPlayerLeft(playerId: playerId),
       );
-    _applyUpdateUnchecked(patch);
 
-    return Tuple2(playerId, patch);
-  }
+  UpdateState updateLobbyPlayerReady(int playerId, List<Character> characters) =>
+      _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..playerReady = DoPlayerReady(playerId: playerId, characters: characters),
+      );
 
-  UpdateState updateLobbyLeave(int playerId) {
-    final patch = _makeUpdate(confirm: false)
-      ..clearAction()
-      ..playerLeft = DoPlayerLeft(playerId: playerId);
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
-
-  UpdateState updateLobbyPlayerReady(int playerId, List<Character> characters) {
-    final patch = _makeUpdate(confirm: false)
-      ..clearAction()
-      ..playerReady = DoPlayerReady(playerId: playerId, characters: characters);
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
-
-  UpdateState updateLobbyPlayerNotReady(int playerId) {
-    final patch = _makeUpdate(confirm: false)
-      ..clearAction()
-      ..playerNotReady = DoPlayerNotReady(playerId: playerId);
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
+  UpdateState updateLobbyPlayerNotReady(int playerId) => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..playerNotReady = DoPlayerNotReady(playerId: playerId),
+      );
 
   UpdateState updateLobbyPrepareStartGame() {
     _ensureGameStart();
@@ -118,50 +117,54 @@ class GameStateManager {
       );
     }
 
-    final patch = _makeUpdate(confirm: true)
-      ..clearAction()
-      ..prepareStart = DoPrepareStart(teams: TeamList(value: teams));
-    _applyUpdateUnchecked(patch);
-    return patch;
+    return _applyUpdateUnchecked(
+      _makeUpdate(confirm: true)
+        ..clearAction()
+        ..prepareStart = DoPrepareStart(teams: TeamList(value: teams)),
+    );
   }
 
-  UpdateState updateLobbyStartGame() {
-    final patch = _makeUpdate(confirm: false)
-      ..clearAction()
-      ..roundNext = DoNextRound(roundIndex: 0);
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
-
-  UpdateState updateStartTurn() {
-    final patch = _makeUpdate(confirm: true)
-      ..clearAction()
-      ..turnStart = DoStartTurn();
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
-
-  UpdateState updateEndTurn(TurnEndReason reason, List<Int64> guessed) {
-    final patch = _makeUpdate(confirm: false)
-      ..clearAction()
-      ..turnEnd = DoEndTurn(
-        reason: reason,
-        guessed: CharacterIdList(characters: guessed),
+  UpdateState updateLobbyStartGame() => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..roundNext = DoNextRound(roundIndex: 0),
       );
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
 
-  UpdateState updateCastVote(int playerId, List<CharacterVote> result) {
-    final patch = UpdateState(rev: state.rev, confirm: false)
-      ..clearAction()
-      ..votePlayer = DoPlayerVoted(
-        playerId: playerId,
-        result: VoteResult(value: result),
+  UpdateState updatePlayerConnected(int playerId) => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..playerConnected = DoPlayerConnected(playerId: playerId),
       );
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
+
+  UpdateState updatePlayerDisconnected(int playerId) => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..playerDisconnected = DoPlayerDisconnected(playerId: playerId),
+      );
+
+  UpdateState updateStartTurn() => _applyUpdateUnchecked(
+        _makeUpdate(confirm: true)
+          ..clearAction()
+          ..turnStart = DoStartTurn(),
+      );
+
+  UpdateState updateEndTurn(TurnEndReason reason, List<Int64> guessed) => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..turnEnd = DoEndTurn(
+            reason: reason,
+            guessed: CharacterIdList(characters: guessed),
+          ),
+      );
+
+  UpdateState updateCastVote(int playerId, List<CharacterVote> result) => _applyUpdateUnchecked(
+        _makeUpdate(confirm: false)
+          ..clearAction()
+          ..votePlayer = DoPlayerVoted(
+            playerId: playerId,
+            result: VoteResult(value: result),
+          ),
+      );
 
   UpdateState updateCountVotes() {
     _ensureTurnVoteStage();
@@ -198,11 +201,12 @@ class GameStateManager {
           )
           .toList(),
     );
-    final patch = UpdateState(rev: state.rev, confirm: false)
-      ..clearAction()
-      ..voteCount = DoVoteCount(result: result);
-    _applyUpdateUnchecked(patch);
-    return patch;
+
+    return _applyUpdateUnchecked(
+      _makeUpdate(confirm: false)
+        ..clearAction()
+        ..voteCount = DoVoteCount(result: result),
+    );
   }
 
   UpdateState updateNextTurn() {
@@ -216,33 +220,35 @@ class GameStateManager {
         ..clearAction()
         ..turnNext = DoNextTurn(turnIndex: state.round.turnIndex + 1);
     }
-    _applyUpdateUnchecked(patch);
-    return patch;
-  }
-
-  bool applyUpdate(UpdateState patch) {
-    if (patch.rev <= state.rev) {
-      dev.log("old revision received (current = ${state.rev}, received = ${patch.rev})");
-      return false;
-    }
-    if (patch.whichAction() != UpdateState_Action.rewind && patch.rev != state.rev + 1) {
-      dev.log("skipped some states, requesting rewind");
-      return true;
-    }
-
     return _applyUpdateUnchecked(patch);
   }
 
-  bool _applyUpdateUnchecked(UpdateState patch) {
+  int applyUpdate(UpdateState patch) {
+    if (patch.rev <= state.rev) {
+      dev.log("old revision received (current = ${state.rev}, received = ${patch.rev})");
+      return state.rev;
+    }
+    if (patch.whichAction() != UpdateState_Action.rewind && patch.rev != state.rev + 1) {
+      dev.log("skipped some states, requesting rewind");
+      throw StateNotSyncedError();
+    }
+
+    _applyUpdateUnchecked(patch);
+    return state.rev;
+  }
+
+  UpdateState _applyUpdateUnchecked(UpdateState patch) {
     switch (patch.whichAction()) {
       case UpdateState_Action.rewind:
         state = patch.rewind.state;
         break;
       case UpdateState_Action.playerDisconnected:
-        state.players[patch.playerDisconnected.playerId]?.connected = false;
+        ensurePlayerPresent(patch.playerDisconnected.playerId);
+        state.players[patch.playerDisconnected.playerId]!.status = PlayerStatus.CONNECTED;
         break;
       case UpdateState_Action.playerConnected:
-        state.players[patch.playerConnected.playerId]?.connected = true;
+        ensurePlayerPresent(patch.playerConnected.playerId);
+        state.players[patch.playerConnected.playerId]!.status = PlayerStatus.DISCONNECTED;
         break;
       case UpdateState_Action.playerJoined:
         _ensureLobbyStage();
@@ -306,6 +312,7 @@ class GameStateManager {
         } else {
           _ensureTurnVoteCountStage();
           innerState = state.round.state;
+          innerState.roundPoints.value.add(state.round.playerPoints);
         }
 
         nextRound
@@ -393,7 +400,7 @@ class GameStateManager {
     }
 
     state.rev = patch.rev;
-    return false;
+    return patch;
   }
 
   static RunningGameState _stateFromLobby(Lobby lobbyState, TeamList teams) {
@@ -410,7 +417,6 @@ class GameStateManager {
     return RunningGameState(
       teams: teams,
       characters: characters,
-      roundPoints: RoundPoints.create(),
     );
   }
 
@@ -437,7 +443,7 @@ class GameStateManager {
 
   void _ensureGameStart() {
     for (final i in state.players.entries) {
-      if (!i.value.connected || !state.lobby.state.containsKey(i.key)) {
+      if (i.value.status != PlayerStatus.CONNECTED || !state.lobby.state.containsKey(i.key)) {
         throw StartGameError();
       }
     }

@@ -12,6 +12,8 @@ class StartGameError extends RpcError {}
 
 class MissingMetadata extends RpcError {}
 
+class StateNotSyncedError extends RpcError {}
+
 class InvalidUpdateError extends RpcError {
   final String message;
 

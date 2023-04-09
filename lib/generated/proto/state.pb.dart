@@ -246,18 +246,24 @@ class Player extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
       createEmptyInstance: create)
-    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connected')
+    ..e<PlayerStatus>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'status',
+        $pb.PbFieldType.OE,
+        defaultOrMaker: PlayerStatus.JOINING,
+        valueOf: PlayerStatus.valueOf,
+        enumValues: PlayerStatus.values)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..hasRequiredFields = false;
 
   Player._() : super();
   factory Player({
-    $core.bool? connected,
+    PlayerStatus? status,
     $core.String? name,
   }) {
     final _result = create();
-    if (connected != null) {
-      _result.connected = connected;
+    if (status != null) {
+      _result.status = status;
     }
     if (name != null) {
       _result.name = name;
@@ -291,16 +297,16 @@ class Player extends $pb.GeneratedMessage {
   static Player? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.bool get connected => $_getBF(0);
+  PlayerStatus get status => $_getN(0);
   @$pb.TagNumber(1)
-  set connected($core.bool v) {
-    $_setBool(0, v);
+  set status(PlayerStatus v) {
+    setField(1, v);
   }
 
   @$pb.TagNumber(1)
-  $core.bool hasConnected() => $_has(0);
+  $core.bool hasStatus() => $_has(0);
   @$pb.TagNumber(1)
-  void clearConnected() => clearField(1);
+  void clearStatus() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -571,7 +577,7 @@ class PlayerLobbyState extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
       createEmptyInstance: create)
-    ..pc<Character>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'value',
+    ..pc<Character>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'value',
         $pb.PbFieldType.PM,
         subBuilder: Character.create)
     ..hasRequiredFields = false;
@@ -612,7 +618,7 @@ class PlayerLobbyState extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PlayerLobbyState>(create);
   static PlayerLobbyState? _defaultInstance;
 
-  @$pb.TagNumber(3)
+  @$pb.TagNumber(1)
   $core.List<Character> get value => $_getList(0);
 }
 
@@ -625,14 +631,14 @@ class RunningGameState extends $pb.GeneratedMessage {
     ..aOM<TeamList>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'teams',
         subBuilder: TeamList.create)
     ..m<$fixnum.Int64, Character>(
-        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characters',
+        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'characters',
         entryClassName: 'RunningGameState.CharactersEntry',
         keyFieldType: $pb.PbFieldType.OF6,
         valueFieldType: $pb.PbFieldType.OM,
         valueCreator: Character.create,
         packageName: const $pb.PackageName('hat_game.state'))
     ..aOM<RoundPoints>(
-        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'roundPoints',
+        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'roundPoints',
         subBuilder: RoundPoints.create)
     ..hasRequiredFields = false;
 
@@ -694,21 +700,21 @@ class RunningGameState extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   TeamList ensureTeams() => $_ensure(0);
 
-  @$pb.TagNumber(3)
+  @$pb.TagNumber(2)
   $core.Map<$fixnum.Int64, Character> get characters => $_getMap(1);
 
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(3)
   RoundPoints get roundPoints => $_getN(2);
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(3)
   set roundPoints(RoundPoints v) {
-    setField(4, v);
+    setField(3, v);
   }
 
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(3)
   $core.bool hasRoundPoints() => $_has(2);
-  @$pb.TagNumber(4)
-  void clearRoundPoints() => clearField(4);
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(3)
+  void clearRoundPoints() => clearField(3);
+  @$pb.TagNumber(3)
   RoundPoints ensureRoundPoints() => $_ensure(2);
 }
 
@@ -1001,7 +1007,7 @@ class PlayerPoints extends $pb.GeneratedMessage {
           $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
       createEmptyInstance: create)
     ..m<$core.int, CharacterIdList>(
-        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'value',
+        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'value',
         entryClassName: 'PlayerPoints.ValueEntry',
         keyFieldType: $pb.PbFieldType.OF3,
         valueFieldType: $pb.PbFieldType.OM,
@@ -1045,7 +1051,7 @@ class PlayerPoints extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PlayerPoints>(create);
   static PlayerPoints? _defaultInstance;
 
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(1)
   $core.Map<$core.int, CharacterIdList> get value => $_getMap(0);
 }
 
@@ -2885,7 +2891,7 @@ class DoPrepareStart extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
       createEmptyInstance: create)
-    ..aOM<TeamList>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'teams',
+    ..aOM<TeamList>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'teams',
         subBuilder: TeamList.create)
     ..hasRequiredFields = false;
 
@@ -2925,18 +2931,18 @@ class DoPrepareStart extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DoPrepareStart>(create);
   static DoPrepareStart? _defaultInstance;
 
-  @$pb.TagNumber(2)
+  @$pb.TagNumber(1)
   TeamList get teams => $_getN(0);
-  @$pb.TagNumber(2)
+  @$pb.TagNumber(1)
   set teams(TeamList v) {
-    setField(2, v);
+    setField(1, v);
   }
 
-  @$pb.TagNumber(2)
+  @$pb.TagNumber(1)
   $core.bool hasTeams() => $_has(0);
-  @$pb.TagNumber(2)
-  void clearTeams() => clearField(2);
-  @$pb.TagNumber(2)
+  @$pb.TagNumber(1)
+  void clearTeams() => clearField(1);
+  @$pb.TagNumber(1)
   TeamList ensureTeams() => $_ensure(0);
 }
 
