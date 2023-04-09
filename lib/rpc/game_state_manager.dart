@@ -5,30 +5,31 @@ import "dart:math";
 import "package:fixnum/fixnum.dart";
 import "package:tuple/tuple.dart";
 
-import "../generated/proto/service.pb.dart";
 import "../generated/proto/state.pb.dart";
 import "error.dart";
+import "game_state_ext.dart";
 
 const int kInt32Max = 0x7fffffff;
 const int kFirstRev = 1;
 
 class GameStateManager {
   final Random rng;
-  GameState state;
+  GameState inner;
 
-  GameStateManager({required this.state}) : rng = Random.secure();
+  GameStateManager()
+      : inner = GameState(rev: 0),
+        rng = Random.secure();
 
-  factory GameStateManager.fromClient({required GameState state}) => GameStateManager(state: state);
+  factory GameStateManager.fromClient({required GameState state}) =>
+      GameStateManager()..inner = state;
 
   factory GameStateManager.fromHost({
-    required String id,
     required Settings settings,
     required String playerName,
   }) {
-    final result = GameStateManager(state: GameState.create());
+    final result = GameStateManager();
     final hostId = result._generatePlayerId();
-    result.state
-      ..id = id
+    result.inner
       ..rev = kFirstRev
       // TODO: handle connection status
       ..players[hostId] = Player(status: PlayerStatus.CONNECTED, name: playerName)
@@ -40,27 +41,21 @@ class GameStateManager {
     return result;
   }
 
-  int get rev => state.rev;
+  int get rev => inner.rev;
 
   void ensurePlayerPresent(int playerId) {
-    if (!state.players.containsKey(playerId)) {
+    if (!inner.players.containsKey(playerId)) {
       throw PlayerNotFoundError();
     }
   }
 
-  int getActivePlayer() {
-    _ensureRoundStage();
-    final teams = state.round.state.teams.value;
-    final teamsTotal = teams.length;
-    final turnIndex = state.round.turnIndex % state.players.length;
-
-    final activeTeam = teams[turnIndex % teamsTotal];
-    return (turnIndex >= teamsTotal) ? activeTeam.firstPlayerId : activeTeam.secondPlayerId;
-  }
-
-  UpdateState makeRewindPatch() => UpdateState(rev: state.rev, confirm: false)
+  UpdateState makeRewindPatch() => UpdateState(rev: inner.rev, confirm: false)
     ..clearAction()
-    ..rewind = DoRewind(state: state);
+    ..rewind = DoRewind(state: inner);
+
+  UpdateState makeShutdownPatch() => _makeUpdate(confirm: false)
+    ..clearAction()
+    ..closed = DoGameClosed();
 
   Tuple2<int, UpdateState> updateLobbyJoin(String playerName) {
     final playerId = _generatePlayerId();
@@ -100,7 +95,7 @@ class GameStateManager {
   UpdateState updateLobbyPrepareStartGame() {
     _ensureGameStart();
 
-    final players = state.players.keys.toList()..shuffle(rng);
+    final players = inner.players.keys.toList()..shuffle(rng);
     final teamsTotal = players.length ~/ 2;
     final teams = List<Team>.empty(growable: true);
     for (var i = 0; i < teamsTotal; ++i) {
@@ -169,13 +164,13 @@ class GameStateManager {
   UpdateState updateCountVotes() {
     _ensureTurnVoteStage();
 
-    final activePlayer = getActivePlayer();
-    final teamsTotal = state.round.state.teams.value.length;
+    final activePlayer = inner.getActivePlayer()!;
+    final teamsTotal = inner.round.state.teams.value.length;
 
     final voteCounter = Map.fromEntries(
-      state.round.vote.guessed.characters.map((e) => MapEntry(e, _CharacterVoteCount())),
+      inner.round.vote.guessed.characters.map((e) => MapEntry(e, _CharacterVoteCount())),
     );
-    for (final i in state.round.vote.playerVote.entries) {
+    for (final i in inner.round.vote.playerVote.entries) {
       for (final charVote in i.value.value) {
         final charCounter = voteCounter[charVote.characterId]!;
         if (charVote.outcome == CharacterVoteOutcome.APPROVED) {
@@ -211,83 +206,84 @@ class GameStateManager {
 
   UpdateState updateNextTurn() {
     late UpdateState patch;
-    if (state.round.characterPool.characters.isEmpty) {
+    if (inner.round.characterPool.characters.isEmpty) {
       patch = _makeUpdate(confirm: true)
         ..clearAction()
-        ..roundNext = DoNextRound(roundIndex: state.round.roundIndex + 1);
+        ..roundNext = DoNextRound(roundIndex: inner.round.roundIndex + 1);
     } else {
       patch = _makeUpdate(confirm: false)
         ..clearAction()
-        ..turnNext = DoNextTurn(turnIndex: state.round.turnIndex + 1);
+        ..turnNext = DoNextTurn(turnIndex: inner.round.turnIndex + 1);
     }
     return _applyUpdateUnchecked(patch);
   }
 
   int applyUpdate(UpdateState patch) {
-    if (patch.rev <= state.rev) {
-      dev.log("old revision received (current = ${state.rev}, received = ${patch.rev})");
-      return state.rev;
+    if (patch.rev <= inner.rev) {
+      dev.log("old revision received (current = ${inner.rev}, received = ${patch.rev})");
+      return inner.rev;
     }
-    if (patch.whichAction() != UpdateState_Action.rewind && patch.rev != state.rev + 1) {
+    if (patch.whichAction() != UpdateState_Action.rewind && patch.rev != inner.rev + 1) {
       dev.log("skipped some states, requesting rewind");
       throw StateNotSyncedError();
     }
 
     _applyUpdateUnchecked(patch);
-    return state.rev;
+    return inner.rev;
   }
 
   UpdateState _applyUpdateUnchecked(UpdateState patch) {
+    dev.log("applying update to rev = ${inner.rev}: $patch");
     switch (patch.whichAction()) {
       case UpdateState_Action.rewind:
-        state = patch.rewind.state;
+        inner = patch.rewind.state;
         break;
       case UpdateState_Action.playerDisconnected:
         ensurePlayerPresent(patch.playerDisconnected.playerId);
-        state.players[patch.playerDisconnected.playerId]!.status = PlayerStatus.CONNECTED;
+        inner.players[patch.playerDisconnected.playerId]!.status = PlayerStatus.CONNECTED;
         break;
       case UpdateState_Action.playerConnected:
         ensurePlayerPresent(patch.playerConnected.playerId);
-        state.players[patch.playerConnected.playerId]!.status = PlayerStatus.DISCONNECTED;
+        inner.players[patch.playerConnected.playerId]!.status = PlayerStatus.DISCONNECTED;
         break;
       case UpdateState_Action.playerJoined:
         _ensureLobbyStage();
-        for (final i in state.players.entries) {
+        for (final i in inner.players.entries) {
           if (i.value.name == patch.playerJoined.player.name) {
             throw PlayerNameTakenError();
           }
         }
 
-        state.players[patch.playerJoined.playerId] = patch.playerJoined.player;
+        inner.players[patch.playerJoined.playerId] = patch.playerJoined.player;
         break;
       case UpdateState_Action.playerLeft:
         _ensureLobbyStage();
         ensurePlayerPresent(patch.playerLeft.playerId);
 
-        state
+        inner
           ..players.remove(patch.playerLeft.playerId)
           ..lobby.state.remove(patch.playerLeft.playerId);
         break;
       case UpdateState_Action.playerReady:
         _ensureLobbyStage();
-        if (patch.playerReady.characters.length != state.settings.characterCount) {
-          throw CharactersInvalid();
+        if (patch.playerReady.characters.length != inner.settings.characterCount) {
+          throw CharactersInvalidError();
         }
 
-        state.lobby.state[patch.playerReady.playerId] =
+        inner.lobby.state[patch.playerReady.playerId] =
             PlayerLobbyState(value: patch.playerReady.characters);
         break;
       case UpdateState_Action.playerNotReady:
         _ensureLobbyStage();
         ensurePlayerPresent(patch.playerNotReady.playerId);
 
-        state.lobby.state.remove(patch.playerNotReady.playerId);
+        inner.lobby.state.remove(patch.playerNotReady.playerId);
         break;
       case UpdateState_Action.prepareStart:
         _ensureLobbyStage();
 
-        final lobbyState = state.lobby;
-        state
+        final lobbyState = inner.lobby;
+        inner
           ..clearStage()
           ..preparing = _stateFromLobby(
             lobbyState,
@@ -308,11 +304,11 @@ class GameStateManager {
         late RunningGameState innerState;
         if (value.roundIndex == 0) {
           _ensurePreparingStage();
-          innerState = state.preparing;
+          innerState = inner.preparing;
         } else {
           _ensureTurnVoteCountStage();
-          innerState = state.round.state;
-          innerState.roundPoints.value.add(state.round.playerPoints);
+          innerState = inner.round.state;
+          innerState.roundPoints.value.add(inner.round.playerPoints);
         }
 
         nextRound
@@ -321,20 +317,20 @@ class GameStateManager {
           )
           ..state = innerState;
 
-        state
+        inner
           ..clearStage()
           ..round = nextRound;
         break;
       case UpdateState_Action.pause:
         _ensureRoundStage();
 
-        state.round.paused = patch.pause.state;
+        inner.round.paused = patch.pause.state;
         break;
       case UpdateState_Action.turnNext:
         _ensureNotPaused();
         _ensureTurnOverviewOrVoteCountStage();
 
-        state.round
+        inner.round
           ..turnIndex = patch.turnNext.turnIndex
           ..clearTurnState()
           ..prepare = TurnPrepare();
@@ -343,7 +339,7 @@ class GameStateManager {
         _ensureNotPaused();
         _ensureTurnPrepareStage();
 
-        state
+        inner
           ..round.clearTurnState()
           ..round.active = TurnActive();
         break;
@@ -351,7 +347,7 @@ class GameStateManager {
         _ensureNotPaused();
         _ensureTurnActiveStage();
 
-        state.round
+        inner.round
           ..clearTurnState()
           ..vote = TurnVote(
             reason: patch.turnEnd.reason,
@@ -363,19 +359,19 @@ class GameStateManager {
         _ensureNotPaused();
         _ensureTurnVoteStage();
 
-        state.round.vote.playerVote[patch.votePlayer.playerId] = patch.votePlayer.result;
+        inner.round.vote.playerVote[patch.votePlayer.playerId] = patch.votePlayer.result;
         break;
       case UpdateState_Action.voteCount:
         _ensureNotPaused();
         _ensureTurnVoteStage();
 
-        final activePlayer = getActivePlayer();
+        final activePlayer = inner.getActivePlayer()!;
         final approved = patch.voteCount.result.value
             .where((e) => e.outcome == CharacterVoteOutcome.APPROVED)
             .map((e) => e.characterId)
             .toList();
 
-        state.round
+        inner.round
           ..characterPool.characters.removeWhere(approved.contains)
           ..playerPoints.value.update(activePlayer, (value) {
             value.characters.addAll(approved);
@@ -388,18 +384,19 @@ class GameStateManager {
         _ensureNotPaused();
         _ensureTurnVoteCountStage();
 
-        final innerState = state.round.state;
-        state
+        final innerState = inner.round.state;
+        inner
           ..clearStage()
           ..finished = innerState;
         break;
       case UpdateState_Action.handshake:
       case UpdateState_Action.closed:
       case UpdateState_Action.notSet:
-        throw InvalidUpdateError(message: "unsupported action");
+        dev.log("unsupported action: $patch");
+        break;
     }
 
-    state.rev = patch.rev;
+    inner.rev = patch.rev;
     return patch;
   }
 
@@ -435,90 +432,90 @@ class GameStateManager {
           guessed.map((e) => CharacterVote(characterId: e, outcome: CharacterVoteOutcome.APPROVED)),
     );
     final result = HashMap<int, VoteResult>();
-    for (final playerId in state.players.keys) {
+    for (final playerId in inner.players.keys) {
       result[playerId] = allApproved;
     }
     return result;
   }
 
   void _ensureGameStart() {
-    for (final i in state.players.entries) {
-      if (i.value.status != PlayerStatus.CONNECTED || !state.lobby.state.containsKey(i.key)) {
+    for (final i in inner.players.entries) {
+      if (i.value.status != PlayerStatus.CONNECTED || !inner.lobby.state.containsKey(i.key)) {
         throw StartGameError();
       }
     }
   }
 
   void _ensureLobbyStage() {
-    if (state.whichStage() != GameState_Stage.lobby) {
+    if (inner.whichStage() != GameState_Stage.lobby) {
       throw InvalidUpdateError(message: "game is not in lobby stage");
     }
   }
 
   void _ensurePreparingStage() {
-    if (state.whichStage() != GameState_Stage.preparing) {
+    if (inner.whichStage() != GameState_Stage.preparing) {
       throw InvalidUpdateError(message: "game is not in preparing stage");
     }
   }
 
   void _ensureRoundStage() {
-    if (state.whichStage() != GameState_Stage.round) {
+    if (inner.whichStage() != GameState_Stage.round) {
       throw InvalidUpdateError(message: "game is not in round stage");
     }
   }
 
   void _ensureNotPaused() {
-    if (state.whichStage() == GameState_Stage.round && state.round.paused) {
+    if (inner.whichStage() == GameState_Stage.round && inner.round.paused) {
       throw InvalidUpdateError(message: "game is paused");
     }
   }
 
   void _ensureTurnPrepareStage() {
-    if (state.whichStage() != GameState_Stage.round ||
-        state.round.whichTurnState() != Round_TurnState.prepare) {
+    if (inner.whichStage() != GameState_Stage.round ||
+        inner.round.whichTurnState() != Round_TurnState.prepare) {
       throw InvalidUpdateError(message: "game is not in turn prepare stage");
     }
   }
 
   void _ensureTurnActiveStage() {
-    if (state.whichStage() != GameState_Stage.round ||
-        state.round.whichTurnState() != Round_TurnState.active) {
+    if (inner.whichStage() != GameState_Stage.round ||
+        inner.round.whichTurnState() != Round_TurnState.active) {
       throw InvalidUpdateError(message: "game is not in turn active stage");
     }
   }
 
   void _ensureTurnVoteStage() {
-    if (state.whichStage() != GameState_Stage.round ||
-        state.round.whichTurnState() != Round_TurnState.vote) {
+    if (inner.whichStage() != GameState_Stage.round ||
+        inner.round.whichTurnState() != Round_TurnState.vote) {
       throw InvalidUpdateError(message: "game is not in turn vote stage");
     }
   }
 
   void _ensureTurnVoteCountStage() {
-    if (state.whichStage() != GameState_Stage.round ||
-        state.round.whichTurnState() != Round_TurnState.voteCount) {
+    if (inner.whichStage() != GameState_Stage.round ||
+        inner.round.whichTurnState() != Round_TurnState.voteCount) {
       throw InvalidUpdateError(message: "game is not in turn vote count stage");
     }
   }
 
   void _ensureTurnOverviewOrVoteCountStage() {
-    if (state.whichStage() != GameState_Stage.round ||
-        (state.round.whichTurnState() != Round_TurnState.overview &&
-            state.round.whichTurnState() != Round_TurnState.voteCount)) {
+    if (inner.whichStage() != GameState_Stage.round ||
+        (inner.round.whichTurnState() != Round_TurnState.overview &&
+            inner.round.whichTurnState() != Round_TurnState.voteCount)) {
       throw InvalidUpdateError(message: "game is not in turn overview stage");
     }
   }
 
   int _generatePlayerId() {
     var result = rng.nextInt(kInt32Max);
-    while (state.players.keys.contains(result)) {
+    while (inner.players.keys.contains(result)) {
       result = rng.nextInt(kInt32Max);
     }
     return result;
   }
 
   UpdateState _makeUpdate({required bool confirm}) =>
-      UpdateState(rev: state.rev + 1, confirm: confirm);
+      UpdateState(rev: inner.rev + 1, confirm: confirm);
 }
 
 class _CharacterVoteCount {

@@ -4,17 +4,16 @@ package hat_game.state;
 import "proto/error.proto";
 
 message GameState {
-  string id = 1;
   // Incremental state revision, first valid revision is 1
-  uint32 rev = 2;
-  map<fixed32, Player> players = 3;
-  fixed32 host_id = 4;
-  Settings settings = 5;
+  uint32 rev = 1;
+  map<fixed32, Player> players = 2;
+  fixed32 host_id = 3;
+  Settings settings = 4;
   oneof stage {
-    Lobby lobby = 6;
-    RunningGameState preparing = 7;
-    Round round = 8;
-    RunningGameState finished = 9;
+    Lobby lobby = 5;
+    RunningGameState preparing = 6;
+    Round round = 7;
+    RunningGameState finished = 8;
   }
 }
 

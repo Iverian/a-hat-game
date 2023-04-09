@@ -6,9 +6,12 @@ import "dart:isolate";
 import "package:fixnum/fixnum.dart";
 import "package:mutex/mutex.dart";
 
+import "../generated/proto/error.pb.dart";
 import "../generated/proto/state.pb.dart";
 import "error.dart";
+import "game_state_ext.dart";
 import "game_state_manager.dart";
+import "util.dart";
 
 const kConfirmTimeout = Duration(seconds: 5);
 const kGrpcPlayerId = "X-Player-Id";
@@ -16,9 +19,12 @@ const kGrpcRev = "X-Revision";
 
 class PlayerMetadata {
   final int playerId;
-  final int rev;
+  int rev;
 
   PlayerMetadata({required this.playerId, required this.rev});
+
+  factory PlayerMetadata.fromId({required int playerId}) =>
+      PlayerMetadata(playerId: playerId, rev: 0);
 
   factory PlayerMetadata.fromGrpc(Map<String, String>? clientMetadata) {
     try {
@@ -28,7 +34,7 @@ class PlayerMetadata {
         rev: int.tryParse(src[kGrpcRev]!)!,
       );
     } on Exception catch (_) {
-      throw MissingMetadata();
+      throw MissingMetadataError();
     }
   }
 
@@ -53,6 +59,7 @@ class GameServer {
   LocalGameClient getClient() => LocalGameClient(tx: _rx.sendPort);
 
   Future<void> serve() async {
+    var exit = false;
     await for (final _Request req in _rx) {
       dynamic response;
       try {
@@ -97,11 +104,18 @@ class GameServer {
           case _RequestKind.nextTurn:
             response = await _nextTurn().then((value) => null);
             break;
+          case _RequestKind.shutdown:
+            response = await _shutdown().then((value) => null);
+            exit = true;
+            break;
         }
       } on Exception catch (e) {
         req.tx.send(e);
       }
       req.tx.send(response);
+      if (exit) {
+        break;
+      }
     }
   }
 
@@ -150,7 +164,7 @@ class GameServer {
   }
 
   Future<void> _startTurn(PlayerMetadata data) async {
-    if (_state.getActivePlayer() != data.playerId) {
+    if (_state.inner.getActivePlayer()! != data.playerId) {
       dev.log("received start turn command from inactive player");
       return;
     }
@@ -158,7 +172,7 @@ class GameServer {
   }
 
   Future<void> _endTurn(_EndTurnData data) async {
-    if (_state.getActivePlayer() != data.player.playerId) {
+    if (_state.inner.getActivePlayer()! != data.player.playerId) {
       dev.log("received end turn command from inactive player");
       return;
     }
@@ -176,6 +190,10 @@ class GameServer {
   Future<void> _nextTurn() async {
     await _listeners.notifyAll(_state.updateNextTurn());
   }
+
+  Future<void> _shutdown() async {
+    await _listeners.notifyAll(_state.makeShutdownPatch());
+  }
 }
 
 class LocalGameClient {
@@ -185,11 +203,30 @@ class LocalGameClient {
 
   Stream<UpdateState> subscribe({required PlayerMetadata player}) async* {
     final result = ReceivePort();
-    await _request(
-      kind: _RequestKind.subscribe,
-      data: _SubscribeData(tx: result.sendPort, player: player),
+    try {
+      await _request(
+        kind: _RequestKind.subscribe,
+        data: _SubscribeData(tx: result.sendPort, player: player),
+      );
+    } on RpcError catch (e) {
+      yield UpdateState(
+        rev: 0,
+        confirm: false,
+        handshake: DoHandshake(err: e.toProtocolError()),
+      );
+      return;
+    }
+    yield UpdateState(
+      rev: 0,
+      confirm: false,
+      handshake: DoHandshake(ok: Empty()),
     );
-    yield* result as Stream<UpdateState>;
+    await for (final dynamic event in result) {
+      if (event == null) {
+        return;
+      }
+      yield event as UpdateState;
+    }
   }
 
   Future<void> confirm({required PlayerMetadata player}) async {
@@ -266,6 +303,10 @@ class LocalGameClient {
     await _request(kind: _RequestKind.nextTurn);
   }
 
+  Future<void> shutdown() async {
+    await _request(kind: _RequestKind.shutdown);
+  }
+
   Future<dynamic> _request({
     required _RequestKind kind,
     data,
@@ -278,15 +319,7 @@ class LocalGameClient {
         data: data,
       ),
     );
-    return _handleResponse(rx);
-  }
-
-  Future<dynamic> _handleResponse(ReceivePort rx) async {
-    final value = await rx.first;
-    if (value is Exception) {
-      throw value;
-    }
-    return value;
+    return handleResponse(await rx.first);
   }
 }
 
@@ -304,6 +337,7 @@ enum _RequestKind {
   castVote,
   countVotes,
   nextTurn,
+  shutdown,
 }
 
 class _Request {
@@ -369,7 +403,7 @@ class _Listeners {
   Future<void> notifyAll(UpdateState message) async {
     await _lock.protectRead(() async {
       for (final i in _data.entries) {
-        dev.log("updating player ${i.key} state to ${message.rev}");
+        dev.log("updating player ${i.key} state to ${message.rev}: $message");
         i.value.send(message);
       }
       if (message.confirm) {

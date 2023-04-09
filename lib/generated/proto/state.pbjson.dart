@@ -50,32 +50,31 @@ final $typed_data.Uint8List characterVoteOutcomeDescriptor =
 const GameState$json = {
   '1': 'GameState',
   '2': [
-    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
-    {'1': 'rev', '3': 2, '4': 1, '5': 13, '10': 'rev'},
+    {'1': 'rev', '3': 1, '4': 1, '5': 13, '10': 'rev'},
     {
       '1': 'players',
-      '3': 3,
+      '3': 2,
       '4': 3,
       '5': 11,
       '6': '.hat_game.state.GameState.PlayersEntry',
       '10': 'players'
     },
-    {'1': 'host_id', '3': 4, '4': 1, '5': 7, '10': 'hostId'},
-    {'1': 'settings', '3': 5, '4': 1, '5': 11, '6': '.hat_game.state.Settings', '10': 'settings'},
-    {'1': 'lobby', '3': 6, '4': 1, '5': 11, '6': '.hat_game.state.Lobby', '9': 0, '10': 'lobby'},
+    {'1': 'host_id', '3': 3, '4': 1, '5': 7, '10': 'hostId'},
+    {'1': 'settings', '3': 4, '4': 1, '5': 11, '6': '.hat_game.state.Settings', '10': 'settings'},
+    {'1': 'lobby', '3': 5, '4': 1, '5': 11, '6': '.hat_game.state.Lobby', '9': 0, '10': 'lobby'},
     {
       '1': 'preparing',
-      '3': 7,
+      '3': 6,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.RunningGameState',
       '9': 0,
       '10': 'preparing'
     },
-    {'1': 'round', '3': 8, '4': 1, '5': 11, '6': '.hat_game.state.Round', '9': 0, '10': 'round'},
+    {'1': 'round', '3': 7, '4': 1, '5': 11, '6': '.hat_game.state.Round', '9': 0, '10': 'round'},
     {
       '1': 'finished',
-      '3': 9,
+      '3': 8,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.RunningGameState',
@@ -101,7 +100,7 @@ const GameState_PlayersEntry$json = {
 
 /// Descriptor for `GameState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
-    'CglHYW1lU3RhdGUSDgoCaWQYASABKAlSAmlkEhAKA3JldhgCIAEoDVIDcmV2EkAKB3BsYXllcnMYAyADKAsyJi5oYXRfZ2FtZS5zdGF0ZS5HYW1lU3RhdGUuUGxheWVyc0VudHJ5UgdwbGF5ZXJzEhcKB2hvc3RfaWQYBCABKAdSBmhvc3RJZBI0CghzZXR0aW5ncxgFIAEoCzIYLmhhdF9nYW1lLnN0YXRlLlNldHRpbmdzUghzZXR0aW5ncxItCgVsb2JieRgGIAEoCzIVLmhhdF9nYW1lLnN0YXRlLkxvYmJ5SABSBWxvYmJ5EkAKCXByZXBhcmluZxgHIAEoCzIgLmhhdF9nYW1lLnN0YXRlLlJ1bm5pbmdHYW1lU3RhdGVIAFIJcHJlcGFyaW5nEi0KBXJvdW5kGAggASgLMhUuaGF0X2dhbWUuc3RhdGUuUm91bmRIAFIFcm91bmQSPgoIZmluaXNoZWQYCSABKAsyIC5oYXRfZ2FtZS5zdGF0ZS5SdW5uaW5nR2FtZVN0YXRlSABSCGZpbmlzaGVkGlIKDFBsYXllcnNFbnRyeRIQCgNrZXkYASABKAdSA2tleRIsCgV2YWx1ZRgCIAEoCzIWLmhhdF9nYW1lLnN0YXRlLlBsYXllclIFdmFsdWU6AjgBQgcKBXN0YWdl');
+    'CglHYW1lU3RhdGUSEAoDcmV2GAEgASgNUgNyZXYSQAoHcGxheWVycxgCIAMoCzImLmhhdF9nYW1lLnN0YXRlLkdhbWVTdGF0ZS5QbGF5ZXJzRW50cnlSB3BsYXllcnMSFwoHaG9zdF9pZBgDIAEoB1IGaG9zdElkEjQKCHNldHRpbmdzGAQgASgLMhguaGF0X2dhbWUuc3RhdGUuU2V0dGluZ3NSCHNldHRpbmdzEi0KBWxvYmJ5GAUgASgLMhUuaGF0X2dhbWUuc3RhdGUuTG9iYnlIAFIFbG9iYnkSQAoJcHJlcGFyaW5nGAYgASgLMiAuaGF0X2dhbWUuc3RhdGUuUnVubmluZ0dhbWVTdGF0ZUgAUglwcmVwYXJpbmcSLQoFcm91bmQYByABKAsyFS5oYXRfZ2FtZS5zdGF0ZS5Sb3VuZEgAUgVyb3VuZBI+CghmaW5pc2hlZBgIIAEoCzIgLmhhdF9nYW1lLnN0YXRlLlJ1bm5pbmdHYW1lU3RhdGVIAFIIZmluaXNoZWQaUgoMUGxheWVyc0VudHJ5EhAKA2tleRgBIAEoB1IDa2V5EiwKBXZhbHVlGAIgASgLMhYuaGF0X2dhbWUuc3RhdGUuUGxheWVyUgV2YWx1ZToCOAFCBwoFc3RhZ2U=');
 @$core.Deprecated('Use playerDescriptor instead')
 const Player$json = {
   '1': 'Player',

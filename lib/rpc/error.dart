@@ -1,16 +1,38 @@
-class RpcError implements Exception {}
+import "dart:developer" as dev;
 
-class InvalidStateRevisionError extends RpcError {}
+import "../generated/proto/error.pb.dart";
 
-class PlayerNameTakenError extends RpcError {}
+class RpcError implements Exception {
+  final ErrorCode code;
 
-class PlayerNotFoundError extends RpcError {}
+  RpcError({ErrorCode? code}) : code = (code == null) ? ErrorCode.OTHER : code;
 
-class CharactersInvalid extends RpcError {}
+  factory RpcError.fromProtocolErr(ProtocolError e) => RpcError(code: e.code);
+
+  ProtocolError toProtocolError() => ProtocolError(code: code);
+}
+
+class InvalidStateRevisionError extends RpcError {
+  InvalidStateRevisionError() : super(code: ErrorCode.INVALID_REVISION);
+}
+
+class PlayerNameTakenError extends RpcError {
+  PlayerNameTakenError() : super(code: ErrorCode.PLAYER_NAME_TAKEN);
+}
+
+class PlayerNotFoundError extends RpcError {
+  PlayerNotFoundError() : super(code: ErrorCode.PLAYER_NOT_FOUND);
+}
+
+class CharactersInvalidError extends RpcError {
+  CharactersInvalidError() : super(code: ErrorCode.INVALID_CHARACTER_DATA);
+}
+
+class MissingMetadataError extends RpcError {
+  MissingMetadataError() : super(code: ErrorCode.MISSING_METADATA);
+}
 
 class StartGameError extends RpcError {}
-
-class MissingMetadata extends RpcError {}
 
 class StateNotSyncedError extends RpcError {}
 

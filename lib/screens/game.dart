@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../game.dart";
+import "../generated/proto/state.pb.dart";
 import "../provider.dart";
 import "lobby.dart";
 
@@ -11,6 +12,13 @@ class GameScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    throw UnimplementedError();
+    final gameStage = ref.watch(gamePod.select((value) => value.state.whichStage()));
+
+    switch (gameStage) {
+      case GameState_Stage.lobby:
+        return const LobbyScreen();
+      default:
+        throw UnimplementedError();
+    }
   }
 }

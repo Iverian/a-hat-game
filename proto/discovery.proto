@@ -2,7 +2,9 @@ syntax = "proto3";
 package hat_game.direct;
 
 message DirectLink {
-  string service_id = 1;
+  string id = 1;
   uint32 port = 2;
   optional string code = 3;
 }
+
+message ServiceMetadata { string name = 1; }

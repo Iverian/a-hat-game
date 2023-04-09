@@ -21,7 +21,7 @@ class GrpcJoinService extends JoinServiceBase {
       final playerId = await client.lobbyJoin(playerName: request.playerName);
       return response..ok = playerId;
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 }
@@ -33,28 +33,7 @@ class GrpcGameService extends GameServiceBase {
 
   @override
   Stream<UpdateState> subscribe(ServiceCall call, Empty request) async* {
-    late Stream<UpdateState> stream;
-    try {
-      stream = client.subscribe(player: PlayerMetadata.fromGrpc(call.clientMetadata));
-    } on RpcError catch (e) {
-      yield UpdateState(
-        rev: 0,
-        confirm: false,
-        handshake: DoHandshake(err: toProtocolError(e)),
-      );
-      return;
-    }
-    yield UpdateState(
-      rev: 0,
-      confirm: false,
-      handshake: DoHandshake(ok: Empty()),
-    );
-    await for (final dynamic event in stream) {
-      if (event == null) {
-        return;
-      }
-      yield event as UpdateState;
-    }
+    yield* client.subscribe(player: PlayerMetadata.fromGrpc(call.clientMetadata));
   }
 
   @override
@@ -64,7 +43,7 @@ class GrpcGameService extends GameServiceBase {
       await client.confirm(player: PlayerMetadata.fromGrpc(call.clientMetadata));
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -77,7 +56,7 @@ class GrpcGameService extends GameServiceBase {
       throw UnimplementedError();
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -88,7 +67,7 @@ class GrpcGameService extends GameServiceBase {
       await client.lobbyLeave(player: PlayerMetadata.fromGrpc(call.clientMetadata));
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -105,7 +84,7 @@ class GrpcGameService extends GameServiceBase {
       );
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -116,7 +95,7 @@ class GrpcGameService extends GameServiceBase {
       await client.lobbyPlayerNotReady(player: PlayerMetadata.fromGrpc(call.clientMetadata));
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -127,7 +106,7 @@ class GrpcGameService extends GameServiceBase {
       await client.startTurn(player: PlayerMetadata.fromGrpc(call.clientMetadata));
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -142,7 +121,7 @@ class GrpcGameService extends GameServiceBase {
       );
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
 
@@ -156,25 +135,7 @@ class GrpcGameService extends GameServiceBase {
       );
       return response..ok = Empty();
     } on RpcError catch (e) {
-      return response..err = toProtocolError(e);
+      return response..err = e.toProtocolError();
     }
   }
-}
-
-ProtocolError toProtocolError(RpcError e) {
-  var code = ErrorCode.OTHER;
-  if (e is InvalidStateRevisionError) {
-    code = ErrorCode.INVALID_REVISION;
-  } else if (e is PlayerNameTakenError) {
-    code = ErrorCode.PLAYER_NAME_TAKEN;
-  } else if (e is PlayerNotFoundError) {
-    code = ErrorCode.PLAYER_NOT_FOUND;
-  } else if (e is CharactersInvalid) {
-    code = ErrorCode.INVALID_CHARACTER_DATA;
-  } else if (e is MissingMetadata) {
-    code = ErrorCode.MISSING_METADATA;
-  } else {
-    dev.log("unhandled rpc error: $e");
-  }
-  return ProtocolError(code: code);
 }
