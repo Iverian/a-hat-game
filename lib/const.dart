@@ -1,6 +1,5 @@
 const networkServiceType = "_hatgame._tcp";
-const serverPortRangeStart = 9000;
-const serverPortRangeEnd = 9999;
+const serverPortDefault = 9010;
 const roomNames = [
   "БЕЗУМНЫЙ ДЕНЬ В ОБЩЕЖИТИИ",
   "ВО СНЕ И НАЯВУ",

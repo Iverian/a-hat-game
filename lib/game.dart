@@ -1,68 +1,40 @@
 import "dart:developer" as dev;
 import "dart:io";
+import "dart:isolate";
 
 import "package:flutter/foundation.dart";
 import "package:nsd/nsd.dart";
 
 import "const.dart";
-
-enum GameStage {
-  lobby,
-}
-
-enum DeviceRole {
-  host,
-  client,
-}
+import "generated/proto/game_service.pbgrpc.dart";
 
 class GameStateNotifier extends ChangeNotifier {
-  _GameState? _state;
+  _InnerState? _state;
 
   GameStateNotifier();
 
   bool get isActive => _state != null;
 
-  // TODO: implement all game stages
-  // Defines what screen should be active
-  GameStage? get stage {
-    if (_state == null) {
-      return null;
-    }
-    return GameStage.lobby;
-  }
-
-  String get name {
-    _checkActive();
-    return _state!.name;
-  }
-
-  int? get port {
-    _checkActive();
-    return _state!.port;
-  }
-
-  DeviceRole get role {
-    _checkActive();
-    return _state!.role;
-  }
-
   Future<void> create({required String name, required String playerName}) async {
-    assert(_state == null, "invalid game state transition");
+    // assert(_state == null, "invalid game state transition");
 
-    _state = _GameState(
-      name: name,
-      playerName: playerName,
-      hostRegistration: await registerService(
-        name,
-        await GameStateNotifier._assignPort(),
-      ),
-    );
-    notifyListeners();
+    // final port = await GameStateNotifier._assignPort();
+    // final result = await spawnHost(name, playerName, port);
+
+    // _state = _InnerState(
+    //   client: result.client,
+    //   hostHandle: result.handle,
+    //   hostRegistration: await registerService(name, port),
+    // );
+    // notifyListeners();
   }
 
   Future<void> exit() async {
-    _checkActive();
-    await _state!._onDispose();
+    if (_state == null) {
+      return;
+    }
+
+    await _state!.onExit();
     _state = null;
     notifyListeners();
   }
@@ -70,24 +42,22 @@ class GameStateNotifier extends ChangeNotifier {
   Future<Registration> registerService(String name, int port) async {
     final reg = await register(Service(name: name, port: port, type: networkServiceType));
     dev.log(
-      "registered service (id=${reg.id}, name=$name, port=$port, type=$networkServiceType",
+      "registered service (id=${reg.id}, host=${reg.service.host} name=$name, port=$port, type=$networkServiceType",
     );
     return reg;
   }
 
-  void _checkActive() {
-    assert(_state != null, "game is not active");
-  }
-
   static Future<int> _assignPort() async {
     RawServerSocket? socket;
+    var port = serverPortDefault;
     try {
       while (socket == null) {
         try {
-          socket = await RawServerSocket.bind(InternetAddress.anyIPv4, 0);
+          socket = await RawServerSocket.bind(InternetAddress.anyIPv4, port);
           break;
         } on IOException catch (e) {
           dev.log("error binding TCP socket: ${e.toString()}");
+          port = 0;
         }
       }
       return socket.port;
@@ -97,28 +67,17 @@ class GameStateNotifier extends ChangeNotifier {
   }
 }
 
-class _GameState {
-  final String _name;
-  final String _playerName;
-  final Registration? _hostRegistration;
+class _InnerState {
+  // final Isolate? hostHandle;
+  // final Registration? hostRegistration;
 
-  _GameState({
-    required String name,
-    required String playerName,
-    Registration? hostRegistration,
-  })  : _name = name,
-        _playerName = playerName,
-        _hostRegistration = hostRegistration;
+  // _InnerState({required this.client, this.hostHandle, this.hostRegistration});
 
-  String get name => _name;
-  String get playerName => _playerName;
-  DeviceRole get role => _hostRegistration == null ? DeviceRole.client : DeviceRole.host;
-  int? get port => _hostRegistration?.service.port;
-
-  Future<void> _onDispose() async {
-    if (_hostRegistration != null) {
-      dev.log("unregistered service with id=${_hostRegistration!.id}");
-      await unregister(_hostRegistration!);
-    }
+  Future<void> onExit() async {
+    // if (hostRegistration != null) {
+    //   dev.log("unregistered service with id=${hostRegistration!.id}");
+    //   await unregister(hostRegistration!);
+    // }
+    // hostHandle?.kill();
   }
 }

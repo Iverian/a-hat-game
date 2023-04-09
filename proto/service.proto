@@ -1,0 +1,54 @@
+syntax = "proto3";
+package hat_game.service;
+
+import "proto/error.proto";
+import "proto/state.proto";
+
+service Join {
+  rpc LobbyJoin(LobbyJoinRequest) returns (LobbyJoinResponse) {}
+}
+
+service Game {
+  // Subscribe to state updates
+  // Sends player id and current state revision
+  // Send rev = 0 to force state rewind
+  rpc Subscribe(hat_game.error.Empty)
+      returns (stream hat_game.state.UpdateState) {}
+  rpc Confirm(hat_game.error.Empty) returns (FallibleResponse) {}
+  rpc Heartbeat(hat_game.error.Empty) returns (FallibleResponse) {}
+
+  rpc LobbyLeave(hat_game.error.Empty) returns (FallibleResponse) {}
+  rpc LobbyPlayerReady(LobbyPlayerReadyRequest) returns (FallibleResponse) {}
+  rpc LobbyPlayerNotReady(hat_game.error.Empty) returns (FallibleResponse) {}
+
+  rpc StartTurn(hat_game.error.Empty) returns (FallibleResponse) {}
+  rpc EndTurn(EndTurnRequest) returns (FallibleResponse) {}
+  rpc CastVote(CastVoteRequest) returns (FallibleResponse) {}
+}
+
+message FallibleResponse {
+  oneof result {
+    hat_game.error.Empty ok = 1;
+    hat_game.error.ProtocolError err = 2;
+  }
+}
+
+message LobbyJoinRequest { string player_name = 1; }
+
+message LobbyJoinResponse {
+  oneof result {
+    fixed32 ok = 1;
+    hat_game.error.ProtocolError err = 2;
+  }
+}
+
+message LobbyPlayerReadyRequest {
+  repeated hat_game.state.Character characters = 2;
+}
+
+message EndTurnRequest {
+  hat_game.state.TurnEndReason reason = 2;
+  hat_game.state.CharacterIdList guessed = 3;
+}
+
+message CastVoteRequest { hat_game.state.VoteResult result = 2; }

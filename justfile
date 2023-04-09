@@ -13,22 +13,23 @@ grpc-gen:
   #!/bin/sh
   set -eu
 
-  in_dir=$(realpath "{{ justfile_directory() }}/proto")
-  out_dir=$(realpath "{{ justfile_directory() }}/lib/generated")
-  mkdir -p "${out_dir}"
+  base_dir=$(realpath "{{ justfile_directory() }}")
+  in_dir="${base_dir}/proto"
+  out_dir="${base_dir}/lib/generated"
 
+  mkdir -p "${out_dir}"
   for i in $(find "${in_dir}" -name '*.proto' -type f) ; do
-    p=$(realpath "--relative-to=${in_dir}" "${i}")
-    protoc "--dart_out=grpc:${out_dir}" "-I${in_dir}" "${p}"
+    p=$(realpath "--relative-to=${base_dir}" "${i}")
+    protoc "--dart_out=grpc:${out_dir}" "-I${base_dir}" "${p}"
   done
 
-  flutter format --line-length 100 --fix "{{ justfile_directory() }}/lib/generated"
+  dart format --line-length 100 --fix "${out_dir}"
 
 grpc-hello addr="localhost":
   grpcurl -plaintext -proto protos/gamehost.proto -d '{"name": "hyu"}' {{ addr }}:12345 gamehost.Greeter/SayHello
 
 # Redirect Android Emulator port to host
-aemu-redir-add console_port="5554" host_port="12345" vm_port="12345":
+aemu-redir-add console_port="5554" host_port="9010" vm_port="9010":
   #!/bin/sh
   set -eu
 
@@ -38,15 +39,15 @@ aemu-redir-add console_port="5554" host_port="12345" vm_port="12345":
     exit 1
   fi
 
-  (
+  {
     echo "auth $(cat "$token")"
     echo "redir add tcp:{{ host_port }}:{{ vm_port }}"
     echo "quit"
-  ) | \
+  } | \
   nc localhost "{{ console_port }}"
 
 # Remove Android Emulator redirection
-aemu-redir-del console_port="5554" host_port="12345":
+aemu-redir-del console_port="5554" host_port="9010":
   #!/bin/sh
   set -eu
 
@@ -56,9 +57,9 @@ aemu-redir-del console_port="5554" host_port="12345":
     exit 1
   fi
 
-  (
+  {
     echo "auth $(cat "$token")"
     echo "redir del tcp:{{ host_port }}"
     echo "quit"
-  ) | \
+  } | \
   nc localhost "{{ console_port }}"

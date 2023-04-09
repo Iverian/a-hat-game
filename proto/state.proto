@@ -1,0 +1,189 @@
+syntax = "proto3";
+package hat_game.state;
+
+import "proto/error.proto";
+
+message GameState {
+  string id = 1;
+  // Incremental state revision, first valid revision is 1
+  uint32 rev = 2;
+  map<fixed32, Player> players = 3;
+  fixed32 host_id = 4;
+  Settings settings = 5;
+  oneof stage {
+    Lobby lobby = 6;
+    RunningGameState preparing = 7;
+    Round round = 8;
+    RunningGameState finished = 9;
+  }
+}
+
+message Player {
+  bool connected = 1;
+  string name = 2;
+}
+
+message Settings {
+  uint32 character_count = 1;
+  uint32 turn_duraction_s = 2;
+  uint32 vote_timeout_s = 3;
+  uint32 start_timeout_s = 4;
+}
+
+message Character {
+  string title = 2;
+  string description = 3;
+}
+
+message Lobby { map<fixed32, PlayerLobbyState> state = 1; }
+
+message PlayerLobbyState { repeated Character value = 3; }
+
+message RunningGameState {
+  TeamList teams = 1;
+  map<fixed64, Character> characters = 3;
+  RoundPoints round_points = 4;
+}
+
+message RoundPoints { repeated PlayerPoints value = 1; }
+
+message Team {
+  fixed32 first_player_id = 1;
+  fixed32 second_player_id = 2;
+  TeamProps props = 3;
+}
+
+message TeamProps {
+  string name = 1;
+  uint32 style_id = 2;
+}
+
+message TeamList { repeated Team value = 1; }
+
+message PlayerPoints { map<fixed32, CharacterIdList> value = 4; }
+
+message CharacterIdList { repeated fixed64 characters = 1; }
+
+message Round {
+  uint32 round_index = 1;
+  uint32 turn_index = 2;
+  bool paused = 3;
+  CharacterIdList character_pool = 4;
+  PlayerPoints player_points = 5;
+  RunningGameState state = 6;
+  oneof turn_state {
+    TurnOverview overview = 7;
+    TurnPrepare prepare = 8;
+    TurnActive active = 9;
+    TurnVote vote = 10;
+    TurnVoteCount vote_count = 11;
+  }
+}
+
+message TurnOverview {}
+
+message TurnPrepare {}
+
+message TurnActive {}
+
+message TurnVote {
+  TurnEndReason reason = 1;
+  CharacterIdList guessed = 2;
+  map<fixed32, VoteResult> player_vote = 3;
+}
+enum TurnEndReason {
+  TIMEOUT = 0;
+  MANUAL = 1;
+}
+
+message VoteResult { repeated CharacterVote value = 1; }
+
+message CharacterVote {
+  fixed64 character_id = 1;
+  CharacterVoteOutcome outcome = 2;
+}
+
+enum CharacterVoteOutcome {
+  APPROVED = 0;
+  REJECTED = 1;
+}
+
+message TurnVoteCount { VoteResult result = 1; }
+
+message UpdateState {
+  uint32 rev = 1;
+  bool confirm = 2;
+  oneof action {
+    DoHandshake handshake = 10;
+    DoGameClosed closed = 11;
+    DoRewind rewind = 12;
+    DoPlayerJoined player_joined = 13;
+    DoPlayerLeft player_left = 14;
+    DoPlayerReady player_ready = 15;
+    DoPlayerNotReady player_not_ready = 16;
+    DoPlayerDisconnected player_disconnected = 17;
+    DoPlayerConnected player_connected = 18;
+    DoPrepareStart prepare_start = 19;
+    DoPause pause = 20;
+    DoNextRound round_next = 21;
+    DoNextTurn turn_next = 22;
+    DoStartTurn turn_start = 23;
+    DoEndTurn turn_end = 24;
+    DoPlayerVoted vote_player = 25;
+    DoVoteCount vote_count = 26;
+    DoGameFinished game_finished = 27;
+  };
+}
+
+message DoHandshake {
+  oneof result {
+    hat_game.error.Empty ok = 1;
+    hat_game.error.ProtocolError err = 2;
+  }
+}
+
+message DoGameClosed {}
+
+message DoRewind { GameState state = 1; }
+
+message DoPlayerJoined {
+  fixed32 player_id = 1;
+  Player player = 2;
+}
+
+message DoPlayerLeft { fixed32 player_id = 1; }
+
+message DoPlayerReady {
+  fixed32 player_id = 1;
+  repeated Character characters = 2;
+}
+
+message DoPlayerNotReady { fixed32 player_id = 1; }
+
+message DoPlayerDisconnected { fixed32 player_id = 1; }
+
+message DoPlayerConnected { fixed32 player_id = 1; }
+
+message DoPrepareStart { TeamList teams = 2; }
+
+message DoPause { bool state = 1; }
+
+message DoNextRound { uint32 round_index = 1; }
+
+message DoNextTurn { uint32 turn_index = 1; }
+
+message DoStartTurn {}
+
+message DoEndTurn {
+  TurnEndReason reason = 1;
+  CharacterIdList guessed = 2;
+}
+
+message DoPlayerVoted {
+  fixed32 player_id = 1;
+  VoteResult result = 2;
+}
+
+message DoVoteCount { VoteResult result = 1; }
+
+message DoGameFinished {}

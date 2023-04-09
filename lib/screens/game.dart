@@ -11,12 +11,6 @@ class GameScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameStage = ref.watch(gamePod.select((value) => value.stage));
-    assert(gameStage != null, "invalid game stage");
-
-    switch (gameStage!) {
-      case GameStage.lobby:
-        return const LobbyScreen();
-    }
+    throw UnimplementedError();
   }
 }

@@ -50,6 +50,11 @@ dependencies:
   shared_preferences_riverpod: ^0.3.0
   tuple: ^2.0.1
   flutter_hooks: ^0.18.5+1
+  network_info_plus: ^3.0.2
+  async: ^2.10.0
+  nanoid: ^1.0.0
+  fixnum: ^1.1.0
+  mutex: ^3.0.1
 
 dev_dependencies:
   flutter_test:

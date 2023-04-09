@@ -1,0 +1,17 @@
+syntax = "proto3";
+package hat_game.error;
+
+enum ErrorCode {
+  // Unhandleable programming error
+  OTHER = 0;
+  MISSING_METADATA = 1;
+  EARLY_REVISION = 2;
+  INVALID_REVISION = 3;
+  PLAYER_NAME_TAKEN = 4;
+  PLAYER_NOT_FOUND = 5;
+  INVALID_CHARACTER_DATA = 6;
+}
+
+message ProtocolError { ErrorCode code = 1; }
+
+message Empty {}
