@@ -171,6 +171,8 @@ ProtocolError toProtocolError(RpcError e) {
     code = ErrorCode.PLAYER_NOT_FOUND;
   } else if (e is CharactersInvalid) {
     code = ErrorCode.INVALID_CHARACTER_DATA;
+  } else if (e is MissingMetadata) {
+    code = ErrorCode.MISSING_METADATA;
   } else {
     dev.log("unhandled rpc error: $e");
   }
