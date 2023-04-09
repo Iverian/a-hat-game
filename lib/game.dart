@@ -6,7 +6,7 @@ import "package:flutter/foundation.dart";
 import "package:nsd/nsd.dart";
 
 import "const.dart";
-import "generated/proto/game_service.pbgrpc.dart";
+import "generated/proto/service.pbgrpc.dart";
 
 class GameStateNotifier extends ChangeNotifier {
   _InnerState? _state;
