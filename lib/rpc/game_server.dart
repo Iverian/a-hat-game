@@ -6,14 +6,14 @@ import "dart:isolate";
 import "package:fixnum/fixnum.dart";
 import "package:mutex/mutex.dart";
 
-import "../generated/proto/error.pb.dart";
+import "../generated/proto/service.pb.dart";
 import "../generated/proto/state.pb.dart";
 import "error.dart";
+import "game_event_ext.dart";
 import "game_state_ext.dart";
 import "game_state_manager.dart";
 import "util.dart";
 
-const kConfirmTimeout = Duration(seconds: 5);
 const kGrpcPlayerId = "X-Player-Id";
 const kGrpcRev = "X-Revision";
 
@@ -54,7 +54,11 @@ class GameServer {
   GameServer({required GameStateManager state})
       : _state = state,
         _rx = ReceivePort(),
-        _listeners = _Listeners();
+        _listeners = _Listeners(
+          Duration(
+            seconds: state.inner.settings.confirmTimeoutS,
+          ),
+        );
 
   LocalGameClient getClient() => LocalGameClient(tx: _rx.sendPort);
 
@@ -111,6 +115,7 @@ class GameServer {
         }
       } on Exception catch (e) {
         req.tx.send(e);
+        continue;
       }
       req.tx.send(response);
       if (exit) {
@@ -123,44 +128,48 @@ class GameServer {
     if (data.rev != _state.rev) {
       throw InvalidStateRevisionError();
     }
-    await _listeners.barrier.setReady(data.playerId);
+    await _listeners.setReady(data.playerId);
   }
 
   Future<void> _subscribe(_SubscribeData data) async {
     _state.ensurePlayerPresent(data.player.playerId);
     await _listeners.add(data.player.playerId, () {
       if (data.player.rev != _state.rev) {
-        data.tx.send(_state.makeRewindPatch());
+        data.tx.send(GameEventExt.doRewind(_state.inner));
       }
       return data.tx;
     });
+
+    final patch = _state.tryUpdatePlayerConnected(data.player.playerId);
+    if (patch != null) {
+      await _notifyAllPatch(patch);
+    }
   }
 
   Future<int> _lobbyJoin(String data) async {
     final result = _state.updateLobbyJoin(data);
-    await _listeners.notifyAll(result.item2);
+    await _notifyAllPatch(result.item2);
     return result.item1;
   }
 
   Future<void> _lobbyLeave(PlayerMetadata data) async {
-    await _listeners.notifyAll(_state.updateLobbyLeave(data.playerId));
+    await _notifyAllPatch(_state.updateLobbyLeave(data.playerId));
   }
 
   Future<void> _lobbyPlayerReady(_LobbyPlayerReadyData data) async {
-    await _listeners
-        .notifyAll(_state.updateLobbyPlayerReady(data.player.playerId, data.characters));
+    await _notifyAllPatch(_state.updateLobbyPlayerReady(data.player.playerId, data.characters));
   }
 
   Future<void> _lobbyPlayerNotReady(PlayerMetadata data) async {
-    await _listeners.notifyAll(_state.updateLobbyPlayerNotReady(data.playerId));
+    await _notifyAllPatch(_state.updateLobbyPlayerNotReady(data.playerId));
   }
 
   Future<void> _lobbyPrepareStartGame() async {
-    await _listeners.notifyAll(_state.updateLobbyPrepareStartGame());
+    await _notifyAllPatch(_state.updateLobbyPrepareStartGame());
   }
 
   Future<void> _lobbyStartGame() async {
-    await _listeners.notifyAll(_state.updateLobbyStartGame());
+    await _notifyAllPatch(_state.updateLobbyStartGame());
   }
 
   Future<void> _startTurn(PlayerMetadata data) async {
@@ -168,7 +177,7 @@ class GameServer {
       dev.log("received start turn command from inactive player");
       return;
     }
-    await _listeners.notifyAll(_state.updateStartTurn());
+    await _notifyAllPatch(_state.updateStartTurn());
   }
 
   Future<void> _endTurn(_EndTurnData data) async {
@@ -176,23 +185,33 @@ class GameServer {
       dev.log("received end turn command from inactive player");
       return;
     }
-    await _listeners.notifyAll(_state.updateEndTurn(data.reason, data.guessed));
+    await _notifyAllPatch(_state.updateEndTurn(data.reason, data.guessed));
   }
 
   Future<void> _castVote(_CastVoteData data) async {
-    await _listeners.notifyAll(_state.updateCastVote(data.player.playerId, data.result));
+    await _notifyAllPatch(_state.updateCastVote(data.player.playerId, data.result));
   }
 
   Future<void> _countVotes() async {
-    await _listeners.notifyAll(_state.updateCountVotes());
+    await _notifyAllPatch(_state.updateCountVotes());
   }
 
   Future<void> _nextTurn() async {
-    await _listeners.notifyAll(_state.updateNextTurn());
+    await _notifyAllPatch(_state.updateNextTurn());
   }
 
   Future<void> _shutdown() async {
-    await _listeners.notifyAll(_state.makeShutdownPatch());
+    await _listeners.notifyAll(GameEventExt.doShutdown());
+  }
+
+  Future<void> _notifyAllPatch(GameStatePatch patch) async {
+    final disconnected = await _listeners.notifyAllPatch(patch);
+    for (final playerId in disconnected) {
+      await _listeners.notifyAllPatch(
+        _state.updatePlayerDisconnected(playerId),
+        forceNoConfirm: true,
+      );
+    }
   }
 }
 
@@ -201,7 +220,7 @@ class LocalGameClient {
 
   LocalGameClient({required this.tx});
 
-  Stream<UpdateState> subscribe({required PlayerMetadata player}) async* {
+  Stream<GameEvent> subscribe({required PlayerMetadata player}) async* {
     final result = ReceivePort();
     try {
       await _request(
@@ -209,23 +228,16 @@ class LocalGameClient {
         data: _SubscribeData(tx: result.sendPort, player: player),
       );
     } on RpcError catch (e) {
-      yield UpdateState(
-        rev: 0,
-        confirm: false,
-        handshake: DoHandshake(err: e.toProtocolError()),
-      );
+      yield GameEventExt.doHandshakeErr(e.code);
       return;
     }
-    yield UpdateState(
-      rev: 0,
-      confirm: false,
-      handshake: DoHandshake(ok: Empty()),
-    );
+
+    yield GameEventExt.doHandshakeOk();
     await for (final dynamic event in result) {
       if (event == null) {
         return;
       }
-      yield event as UpdateState;
+      yield event as GameEvent;
     }
   }
 
@@ -380,91 +392,133 @@ class _CastVoteData {
 class _Listeners {
   final ReadWriteMutex _lock;
   final Map<int, SendPort> _data;
-  final _ConfirmBarrier barrier;
+  final _BarrierLock _barrier;
+  final Duration _confirmTimeout;
 
-  _Listeners()
+  _Listeners(Duration confirmTimeout)
       : _lock = ReadWriteMutex(),
         _data = HashMap(),
-        barrier = _ConfirmBarrier();
+        _barrier = _BarrierLock(),
+        _confirmTimeout = confirmTimeout;
 
-  Future<void> add(int listenerId, SendPort Function() getListener) async {
-    await _lock.protectWrite(() async {
-      _data[listenerId] = getListener();
-    });
-  }
+  Future<void> add(int listenerId, SendPort Function() getListener) => _lock.protectWrite(() async {
+        _removeRaw(listenerId);
+        _data[listenerId] = getListener();
+      });
 
-  Future<void> remove(int listenerId) async {
-    await _lock.protectWrite(() async {
-      final tx = _data.remove(listenerId);
-      tx?.send(null);
-    });
-  }
+  Future<void> remove(int listenerId) => _lock.protectWrite(() async {
+        _removeRaw(listenerId);
+      });
 
-  Future<void> notifyAll(UpdateState message) async {
-    await _lock.protectRead(() async {
-      for (final i in _data.entries) {
-        dev.log("updating player ${i.key} state to ${message.rev}: $message");
-        i.value.send(message);
-      }
-      if (message.confirm) {
-        final result = await barrier.waitFor(_data.keys);
-        if (!result) {
-          // TODO: add better timeout handling
-          throw Exception("timed out");
+  Future<void> setReady(int listenerId) => _barrier.setReady(listenerId);
+
+  Future<void> notifyRewind(int listenerId, GameState state) => _lock.protectRead(() async {
+        _data[listenerId]?.send(GameEventExt.doRewind(state));
+      });
+
+  Future<List<int>> notifyAllPatch(GameStatePatch patch, {bool forceNoConfirm = false}) =>
+      _lock.protectWrite(() async {
+        final event = GameEventExt.doPatch(patch);
+        _notifyAllRaw(event);
+        if (forceNoConfirm || !patch.confirm) {
+          return List.empty();
         }
-      }
-    });
+
+        final rx = ReceivePort();
+        await _barrier.activate(rx.sendPort, _data.keys);
+        try {
+          await _waitWithTimeout(rx);
+          final notReady = await _barrier.deactivate();
+          notReady.forEach(_removeRaw);
+          _notifyAllRaw(GameEventExt.doAck());
+          return notReady;
+        } finally {
+          await _barrier.close();
+        }
+      });
+
+  Future<void> notifyAll(GameEvent event) => _lock.protectRead(() async {
+        _notifyAllRaw(event);
+      });
+
+  Future<dynamic> _waitWithTimeout(ReceivePort rx) => rx.timeout(
+        _confirmTimeout,
+        onTimeout: (sink) {
+          dev.log("timed out waiting for confirmation");
+          sink
+            ..add(null)
+            ..close();
+        },
+      ).first;
+
+  void _removeRaw(int listenerId) {
+    final tx = _data.remove(listenerId);
+    if (tx != null) {
+      dev.log("removed listener for $listenerId");
+      tx.send(null);
+    }
+  }
+
+  void _notifyAllRaw(GameEvent event) {
+    for (final i in _data.entries) {
+      dev.log("sending event to ${i.key}: $event");
+      i.value.send(event);
+    }
   }
 }
 
-class _ConfirmBarrier {
+class _BarrierLock {
   final Mutex _lock;
-  _ConfirmBarrierData? _data;
+  _Barrier? _data;
 
-  _ConfirmBarrier() : _lock = Mutex();
+  _BarrierLock() : _lock = Mutex();
 
-  Future<void> setReady(int listenerId) async {
+  Future<void> setReady(int id) async {
     await _lock.protect(() async {
       if (_data == null) {
-        dev.log("no confirm barrier active");
+        dev.log("barrier is not active");
         return;
       }
-      _data!.setReady(listenerId);
+      _data!.setReady(id);
     });
   }
 
-  Future<bool> waitFor(Iterable<int> listeners) async {
-    final rx = ReceivePort();
+  Future<void> activate(SendPort tx, Iterable<int> ids) async {
     await _lock.protect(() async {
-      _data = _ConfirmBarrierData(rx.sendPort, listeners);
+      assert(_data == null, "already active");
+      _data = _Barrier(tx, ids);
     });
-    final bool result = await rx.timeout(
-      kConfirmTimeout,
-      onTimeout: (sink) {
-        dev.log("timed out waiting for confirmation");
-        sink
-          ..add(false)
-          ..close();
-      },
-    ).first;
+  }
+
+  Future<List<int>> deactivate() => _lock.protect(() async {
+        assert(_data != null, "not active");
+        final result = _data!.notReady();
+        _data = null;
+        return result;
+      });
+
+  Future<void> close() async {
     await _lock.protect(() async {
       _data = null;
     });
-    return result;
   }
 }
 
-class _ConfirmBarrierData {
+class _Barrier {
   final SendPort tx;
   final Map<int, bool> data;
 
-  _ConfirmBarrierData(this.tx, Iterable<int> listeners)
-      : data = HashMap.fromEntries(listeners.map((e) => MapEntry(e, false)));
+  _Barrier(this.tx, Iterable<int> ids) : data = Map.fromEntries(ids.map((e) => MapEntry(e, false)));
 
   void setReady(int id) {
-    data.update(id, (value) => true);
+    if (!data.containsKey(id)) {
+      return;
+    }
+    data[id] = true;
     if (data.values.reduce((value, element) => value && element)) {
-      tx.send(true);
+      tx.send(null);
     }
   }
+
+  List<int> notReady() => data.entries.where((e) => !e.value).map((e) => e.key).toList();
 }

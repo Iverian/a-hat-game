@@ -7,10 +7,10 @@ import "package:grpc/grpc_connection_interface.dart";
 
 import "../generated/proto/state.pb.dart";
 import "game_server.dart";
+import 'game_state_listener.dart';
 import "game_state_manager.dart";
 import "grpc_server.dart";
 import "local_game_state_listener.dart";
-import "state_game_listeners.dart";
 import "util.dart";
 
 class SpawnHostResult {

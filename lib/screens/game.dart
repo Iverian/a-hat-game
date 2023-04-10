@@ -1,13 +1,12 @@
+import "dart:developer" as dev;
+
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:loading_animation_widget/loading_animation_widget.dart";
 
 import "../game.dart";
-import "../generated/proto/state.pb.dart";
 import "../provider.dart";
 import "lobby.dart";
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-
-import "dart:developer" as dev;
 
 // Родитель всех игровых экранов, определяет корректный экран динамически из игрового состояния
 class GameScreen extends ConsumerWidget {

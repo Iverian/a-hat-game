@@ -1,6 +1,4 @@
-import "dart:isolate";
-
-Future<dynamic> handleResponse(dynamic value) async {
+Future<dynamic> handleResponse(value) async {
   if (value is Exception) {
     throw value;
   }

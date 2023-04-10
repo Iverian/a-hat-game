@@ -1,11 +1,9 @@
 import "dart:async";
-import "dart:developer" as dev;
 
-import "package:grpc/src/server/call.dart";
+import "package:grpc/grpc.dart";
 
 import "../generated/proto/error.pb.dart";
 import "../generated/proto/service.pbgrpc.dart";
-import "../generated/proto/state.pb.dart";
 import "error.dart";
 import "game_server.dart";
 
@@ -32,110 +30,106 @@ class GrpcGameService extends GameServiceBase {
   GrpcGameService({required this.client});
 
   @override
-  Stream<UpdateState> subscribe(ServiceCall call, Empty request) async* {
+  Stream<GameEvent> subscribe(ServiceCall call, Empty request) async* {
     yield* client.subscribe(player: PlayerMetadata.fromGrpc(call.clientMetadata));
   }
 
   @override
-  Future<FallibleResponse> confirm(ServiceCall call, Empty request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.confirm(player: PlayerMetadata.fromGrpc(call.clientMetadata));
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  Future<FallibleResponse> confirm(
+    ServiceCall call,
+    Empty request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.confirm(player: player);
+      });
 
   @override
-  Future<FallibleResponse> heartbeat(ServiceCall call, Empty request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      final player = PlayerMetadata.fromGrpc(call.clientMetadata);
-      // TODO: implement heartbeat
-      throw UnimplementedError();
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  Future<FallibleResponse> heartbeat(
+    ServiceCall call,
+    Empty request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        // TODO: implement heartbeat
+        throw UnimplementedError();
+      });
 
   @override
-  Future<FallibleResponse> lobbyLeave(ServiceCall call, Empty request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.lobbyLeave(player: PlayerMetadata.fromGrpc(call.clientMetadata));
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  Future<FallibleResponse> lobbyLeave(
+    ServiceCall call,
+    Empty request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.lobbyLeave(player: player);
+      });
 
   @override
   Future<FallibleResponse> lobbyPlayerReady(
     ServiceCall call,
     LobbyPlayerReadyRequest request,
-  ) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.lobbyPlayerReady(
-        player: PlayerMetadata.fromGrpc(call.clientMetadata),
-        characters: request.characters,
-      );
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.lobbyPlayerReady(
+          player: player,
+          characters: request.characters,
+        );
+      });
 
   @override
-  Future<FallibleResponse> lobbyPlayerNotReady(ServiceCall call, Empty request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.lobbyPlayerNotReady(player: PlayerMetadata.fromGrpc(call.clientMetadata));
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  Future<FallibleResponse> lobbyPlayerNotReady(
+    ServiceCall call,
+    Empty request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.lobbyPlayerNotReady(player: player);
+      });
 
   @override
-  Future<FallibleResponse> startTurn(ServiceCall call, Empty request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.startTurn(player: PlayerMetadata.fromGrpc(call.clientMetadata));
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  Future<FallibleResponse> startTurn(
+    ServiceCall call,
+    Empty request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.startTurn(
+          player: player,
+        );
+      });
 
   @override
-  Future<FallibleResponse> endTurn(ServiceCall call, EndTurnRequest request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.endTurn(
-        player: PlayerMetadata.fromGrpc(call.clientMetadata),
-        reason: request.reason,
-        guessed: request.guessed.characters,
-      );
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
-  }
+  Future<FallibleResponse> endTurn(
+    ServiceCall call,
+    EndTurnRequest request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.endTurn(
+          player: player,
+          reason: request.reason,
+          guessed: request.guessed.characters,
+        );
+      });
 
   @override
-  Future<FallibleResponse> castVote(ServiceCall call, CastVoteRequest request) async {
-    final response = FallibleResponse()..clearResult();
-    try {
-      await client.castVote(
-        player: PlayerMetadata.fromGrpc(call.clientMetadata),
-        result: request.result.value,
-      );
-      return response..ok = Empty();
-    } on RpcError catch (e) {
-      return response..err = e.toProtocolError();
-    }
+  Future<FallibleResponse> castVote(
+    ServiceCall call,
+    CastVoteRequest request,
+  ) =>
+      _wrapRequest(call, (player) async {
+        await client.castVote(
+          player: player,
+          result: request.result.value,
+        );
+      });
+}
+
+Future<FallibleResponse> _wrapRequest(
+  ServiceCall call,
+  Future<void> Function(PlayerMetadata) inner,
+) async {
+  final response = FallibleResponse()..clearResult();
+  try {
+    final player = PlayerMetadata.fromGrpc(call.clientMetadata);
+    await inner(player);
+    return response..ok = Empty();
+  } on RpcError catch (e) {
+    return response..err = e.toProtocolError();
   }
 }

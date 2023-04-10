@@ -30,9 +30,10 @@ enum PlayerStatus {
 
 message Settings {
   uint32 character_count = 1;
-  uint32 turn_duraction_s = 2;
+  uint32 turn_duration_s = 2;
   uint32 vote_timeout_s = 3;
   uint32 start_timeout_s = 4;
+  uint32 confirm_timeout_s = 5;
 }
 
 message Character {
@@ -115,28 +116,25 @@ enum CharacterVoteOutcome {
 
 message TurnVoteCount { VoteResult result = 1; }
 
-message UpdateState {
+message GameStatePatch {
   uint32 rev = 1;
   bool confirm = 2;
-  oneof action {
-    DoHandshake handshake = 10;
-    DoGameClosed closed = 11;
-    DoRewind rewind = 12;
-    DoPlayerJoined player_joined = 13;
-    DoPlayerLeft player_left = 14;
-    DoPlayerReady player_ready = 15;
-    DoPlayerNotReady player_not_ready = 16;
-    DoPlayerDisconnected player_disconnected = 17;
-    DoPlayerConnected player_connected = 18;
-    DoPrepareStart prepare_start = 19;
-    DoPause pause = 20;
-    DoNextRound round_next = 21;
-    DoNextTurn turn_next = 22;
-    DoStartTurn turn_start = 23;
-    DoEndTurn turn_end = 24;
-    DoPlayerVoted vote_player = 25;
-    DoVoteCount vote_count = 26;
-    DoGameFinished game_finished = 27;
+  oneof kind {
+    DoPlayerJoined player_joined = 10;
+    DoPlayerLeft player_left = 11;
+    DoPlayerReady player_ready = 12;
+    DoPlayerNotReady player_not_ready = 13;
+    DoPlayerDisconnected player_disconnected = 14;
+    DoPlayerConnected player_connected = 15;
+    DoPrepareStart prepare_start = 16;
+    DoPause pause = 17;
+    DoNextRound round_next = 18;
+    DoNextTurn turn_next = 19;
+    DoStartTurn turn_start = 20;
+    DoEndTurn turn_end = 21;
+    DoPlayerVoted vote_player = 22;
+    DoVoteCount vote_count = 23;
+    DoGameFinished game_finished = 24;
   };
 }
 

@@ -12,7 +12,6 @@ import 'dart:core' as $core;
 import 'package:grpc/service_api.dart' as $grpc;
 import 'service.pb.dart' as $0;
 import 'error.pb.dart' as $1;
-import 'state.pb.dart' as $2;
 export 'service.pb.dart';
 
 class JoinClient extends $grpc.Client {
@@ -54,10 +53,10 @@ abstract class JoinServiceBase extends $grpc.Service {
 }
 
 class GameClient extends $grpc.Client {
-  static final _$subscribe = $grpc.ClientMethod<$1.Empty, $2.UpdateState>(
+  static final _$subscribe = $grpc.ClientMethod<$1.Empty, $0.GameEvent>(
       '/hat_game.service.Game/Subscribe',
       ($1.Empty value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.UpdateState.fromBuffer(value));
+      ($core.List<$core.int> value) => $0.GameEvent.fromBuffer(value));
   static final _$confirm = $grpc.ClientMethod<$1.Empty, $0.FallibleResponse>(
       '/hat_game.service.Game/Confirm',
       ($1.Empty value) => value.writeToBuffer(),
@@ -96,7 +95,7 @@ class GameClient extends $grpc.Client {
       {$grpc.CallOptions? options, $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
-  $grpc.ResponseStream<$2.UpdateState> subscribe($1.Empty request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$0.GameEvent> subscribe($1.Empty request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$subscribe, $async.Stream.fromIterable([request]),
         options: options);
   }
@@ -146,13 +145,13 @@ abstract class GameServiceBase extends $grpc.Service {
   $core.String get $name => 'hat_game.service.Game';
 
   GameServiceBase() {
-    $addMethod($grpc.ServiceMethod<$1.Empty, $2.UpdateState>(
+    $addMethod($grpc.ServiceMethod<$1.Empty, $0.GameEvent>(
         'Subscribe',
         subscribe_Pre,
         false,
         true,
         ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
-        ($2.UpdateState value) => value.writeToBuffer()));
+        ($0.GameEvent value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$1.Empty, $0.FallibleResponse>(
         'Confirm',
         confirm_Pre,
@@ -211,7 +210,7 @@ abstract class GameServiceBase extends $grpc.Service {
         ($0.FallibleResponse value) => value.writeToBuffer()));
   }
 
-  $async.Stream<$2.UpdateState> subscribe_Pre(
+  $async.Stream<$0.GameEvent> subscribe_Pre(
       $grpc.ServiceCall call, $async.Future<$1.Empty> request) async* {
     yield* subscribe(call, await request);
   }
@@ -256,7 +255,7 @@ abstract class GameServiceBase extends $grpc.Service {
     return castVote(call, await request);
   }
 
-  $async.Stream<$2.UpdateState> subscribe($grpc.ServiceCall call, $1.Empty request);
+  $async.Stream<$0.GameEvent> subscribe($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.FallibleResponse> confirm($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.FallibleResponse> heartbeat($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.FallibleResponse> lobbyLeave($grpc.ServiceCall call, $1.Empty request);

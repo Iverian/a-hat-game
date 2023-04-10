@@ -9,11 +9,7 @@ service Join {
 }
 
 service Game {
-  // Subscribe to state updates
-  // Sends player id and current state revision
-  // Send rev = 0 to force state rewind
-  rpc Subscribe(hat_game.error.Empty)
-      returns (stream hat_game.state.UpdateState) {}
+  rpc Subscribe(hat_game.error.Empty) returns (stream GameEvent) {}
   rpc Confirm(hat_game.error.Empty) returns (FallibleResponse) {}
   rpc Heartbeat(hat_game.error.Empty) returns (FallibleResponse) {}
 
@@ -25,6 +21,24 @@ service Game {
   rpc EndTurn(EndTurnRequest) returns (FallibleResponse) {}
   rpc CastVote(CastVoteRequest) returns (FallibleResponse) {}
 }
+
+message GameEvent {
+  oneof kind {
+    FallibleResponse handshake = 1;
+    EventShutdown shutdown = 2;
+    EventAck ack = 3;
+    EventRewind rewind = 4;
+    EventPatch patch = 5;
+  }
+}
+
+message EventShutdown {}
+
+message EventAck {}
+
+message EventRewind { hat_game.state.GameState state = 1; }
+
+message EventPatch { hat_game.state.GameStatePatch patch = 1; }
 
 message FallibleResponse {
   oneof result {

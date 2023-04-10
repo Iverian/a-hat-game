@@ -2,18 +2,15 @@ import "dart:async";
 import "dart:convert";
 import "dart:developer" as dev;
 import "dart:io";
-import "dart:isolate";
 
 import "package:flutter/foundation.dart";
-import "package:grpc/grpc.dart";
 import "package:nanoid/async.dart";
 import "package:nsd/nsd.dart" as nsd;
 
 import "const.dart";
-import "generated/proto/discovery.pb.dart";
 import "generated/proto/state.pb.dart";
+import "rpc/game_state_listener.dart";
 import "rpc/spawn.dart";
-import "rpc/state_game_listeners.dart";
 
 const kNameKey = "X-Name";
 
@@ -56,11 +53,11 @@ class GameStateNotifier extends ChangeNotifier {
 
   GameState get state => _state!.inner;
 
-  Future<void> create({
+  void create({
     required String name,
     required String playerName,
     required Settings settings,
-  }) async {
+  }) {
     assert(_state == null, "invalid game state transition");
     _stage = GameStage.creating;
 
@@ -83,7 +80,7 @@ class GameStateNotifier extends ChangeNotifier {
 
       _state = _InnerState(listener: result.listener, host: handle);
       _stage = null;
-      await result.listener.createListener(notifyListeners);
+      result.listener.createListener(notifyListeners);
     }());
   }
 
@@ -107,7 +104,7 @@ class GameStateNotifier extends ChangeNotifier {
       nsd.Service(
         name: id,
         port: port,
-        type: networkServiceType,
+        type: kNetworkServiceType,
         txt: Map.fromEntries([
           MapEntry(
             kNameKey,
@@ -117,14 +114,14 @@ class GameStateNotifier extends ChangeNotifier {
       ),
     );
     dev.log(
-      "registered service (id=${reg.id}, name=$name, port=$port, type=$networkServiceType",
+      "registered service (id=${reg.id}, name=$name, port=$port, type=$kNetworkServiceType",
     );
     return reg;
   }
 
   static Future<int> _assignPort() async {
     RawServerSocket? socket;
-    var port = serverPortDefault;
+    var port = kServerPortDefault;
     try {
       while (socket == null) {
         try {

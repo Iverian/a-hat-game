@@ -24,7 +24,7 @@ class JoinGameScreen extends HookConsumerWidget {
 
         Future(() async {
           discovery = await startDiscovery(
-            networkServiceType,
+            kNetworkServiceType,
             ipLookupType: IpLookupType.v4,
           );
           discovery?.addListener(updateServices);

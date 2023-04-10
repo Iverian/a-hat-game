@@ -9,6 +9,92 @@ import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use gameEventDescriptor instead')
+const GameEvent$json = {
+  '1': 'GameEvent',
+  '2': [
+    {
+      '1': 'handshake',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.service.FallibleResponse',
+      '9': 0,
+      '10': 'handshake'
+    },
+    {
+      '1': 'shutdown',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.service.EventShutdown',
+      '9': 0,
+      '10': 'shutdown'
+    },
+    {'1': 'ack', '3': 3, '4': 1, '5': 11, '6': '.hat_game.service.EventAck', '9': 0, '10': 'ack'},
+    {
+      '1': 'rewind',
+      '3': 4,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.service.EventRewind',
+      '9': 0,
+      '10': 'rewind'
+    },
+    {
+      '1': 'patch',
+      '3': 5,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.service.EventPatch',
+      '9': 0,
+      '10': 'patch'
+    },
+  ],
+  '8': [
+    {'1': 'kind'},
+  ],
+};
+
+/// Descriptor for `GameEvent`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List gameEventDescriptor = $convert.base64Decode(
+    'CglHYW1lRXZlbnQSQgoJaGFuZHNoYWtlGAEgASgLMiIuaGF0X2dhbWUuc2VydmljZS5GYWxsaWJsZVJlc3BvbnNlSABSCWhhbmRzaGFrZRI9CghzaHV0ZG93bhgCIAEoCzIfLmhhdF9nYW1lLnNlcnZpY2UuRXZlbnRTaHV0ZG93bkgAUghzaHV0ZG93bhIuCgNhY2sYAyABKAsyGi5oYXRfZ2FtZS5zZXJ2aWNlLkV2ZW50QWNrSABSA2FjaxI3CgZyZXdpbmQYBCABKAsyHS5oYXRfZ2FtZS5zZXJ2aWNlLkV2ZW50UmV3aW5kSABSBnJld2luZBI0CgVwYXRjaBgFIAEoCzIcLmhhdF9nYW1lLnNlcnZpY2UuRXZlbnRQYXRjaEgAUgVwYXRjaEIGCgRraW5k');
+@$core.Deprecated('Use eventShutdownDescriptor instead')
+const EventShutdown$json = {
+  '1': 'EventShutdown',
+};
+
+/// Descriptor for `EventShutdown`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List eventShutdownDescriptor = $convert.base64Decode('Cg1FdmVudFNodXRkb3du');
+@$core.Deprecated('Use eventAckDescriptor instead')
+const EventAck$json = {
+  '1': 'EventAck',
+};
+
+/// Descriptor for `EventAck`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List eventAckDescriptor = $convert.base64Decode('CghFdmVudEFjaw==');
+@$core.Deprecated('Use eventRewindDescriptor instead')
+const EventRewind$json = {
+  '1': 'EventRewind',
+  '2': [
+    {'1': 'state', '3': 1, '4': 1, '5': 11, '6': '.hat_game.state.GameState', '10': 'state'},
+  ],
+};
+
+/// Descriptor for `EventRewind`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List eventRewindDescriptor = $convert.base64Decode(
+    'CgtFdmVudFJld2luZBIvCgVzdGF0ZRgBIAEoCzIZLmhhdF9nYW1lLnN0YXRlLkdhbWVTdGF0ZVIFc3RhdGU=');
+@$core.Deprecated('Use eventPatchDescriptor instead')
+const EventPatch$json = {
+  '1': 'EventPatch',
+  '2': [
+    {'1': 'patch', '3': 1, '4': 1, '5': 11, '6': '.hat_game.state.GameStatePatch', '10': 'patch'},
+  ],
+};
+
+/// Descriptor for `EventPatch`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List eventPatchDescriptor = $convert.base64Decode(
+    'CgpFdmVudFBhdGNoEjQKBXBhdGNoGAEgASgLMh4uaGF0X2dhbWUuc3RhdGUuR2FtZVN0YXRlUGF0Y2hSBXBhdGNo');
 @$core.Deprecated('Use fallibleResponseDescriptor instead')
 const FallibleResponse$json = {
   '1': 'FallibleResponse',

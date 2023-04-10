@@ -1,5 +1,3 @@
-import "dart:developer" as dev;
-
 import "../generated/proto/error.pb.dart";
 
 class RpcError implements Exception {

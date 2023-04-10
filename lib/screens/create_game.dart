@@ -4,8 +4,8 @@ import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../const.dart";
-import "../generated/proto/state.pb.dart";
 import "../provider.dart";
+import "../rpc/settings_ext.dart";
 import "../util.dart";
 import "game.dart";
 
@@ -44,15 +44,13 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                     if (!_formKey.currentState!.validate()) {
                       return;
                     }
-                    await ref.read(gamePod).create(
+                    ref.read(gamePod).create(
                           name: _controller.text,
                           playerName: ref.read(pNamePod),
                           // TODO: replace with settings
-                          settings: Settings(
+                          settings: SettingsExt.fromGameSettings(
                             characterCount: 4,
-                            turnDuractionS: 30,
-                            startTimeoutS: 5,
-                            voteTimeoutS: 15,
+                            turnDurationS: 60,
                           ),
                         );
                     await navReplace(context, (_) => const GameScreen());
@@ -67,6 +65,6 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.text = roomNames[_rng.nextInt(roomNames.length)];
+    _controller.text = kRoomNames[_rng.nextInt(kRoomNames.length)];
   }
 }

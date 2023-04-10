@@ -1,6 +1,6 @@
-const networkServiceType = "_hatgame._tcp";
-const serverPortDefault = 9010;
-const roomNames = [
+const kNetworkServiceType = "_hatgame._tcp";
+const kServerPortDefault = 9010;
+const kRoomNames = [
   "БЕЗУМНЫЙ ДЕНЬ В ОБЩЕЖИТИИ",
   "ВО СНЕ И НАЯВУ",
   "ВОЗВРАТА НЕТ",
