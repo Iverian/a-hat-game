@@ -96,9 +96,6 @@ Future<void> _doSpawnHost(_DoSpawnHostRequest request) async {
     CodecRegistry(codecs: const [grpc.GzipCodec(), grpc.IdentityCodec()]),
   );
 
-  unawaited(server.serve());
-  unawaited(grpcServer.serve(port: request.port));
-
   final rx = ReceivePort();
   request.tx.send(
     _DoSpawnHostResponse(
@@ -108,7 +105,12 @@ Future<void> _doSpawnHost(_DoSpawnHostRequest request) async {
     ),
   );
 
+  final group = FutureGroup()
+    ..add(server.serve())
+    ..add(grpcServer.serve(port: request.port))
+    ..close();
   final _ = await rx.first;
   await grpcServer.shutdown();
   await server.getClient().shutdown();
+  await group.future;
 }

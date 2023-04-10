@@ -1,6 +1,8 @@
+import "dart:async";
 import "dart:isolate";
 
 import "package:async/async.dart";
+import "package:flutter/foundation.dart";
 
 import "../generated/proto/state.pb.dart";
 import "error.dart";
@@ -32,21 +34,31 @@ class LocalGameStateListener implements GameStateListener {
 
   // TODO: add error handling
   @override
-  Future<void> listen(SendPort tx) async {
+  Future<void> createListener(VoidCallback callback) async {
     final q = StreamQueue(_client.subscribe(player: _player));
+
     if ((await q.next).handshake.hasErr()) {
       throw RpcError.fromProtocolErr((await q.next).handshake.err);
     }
-    await for (final patch in q.rest) {
-      if (patch.isFinal()) {
-        _player.rev = patch.rev;
-        break;
+    unawaited(() async {
+      await for (final patch in q.rest) {
+        if (await _handleEvent(patch, callback)) {
+          return;
+        }
       }
-      _player.rev = _state.applyUpdate(patch);
-      if (patch.confirm) {
-        await _client.confirm(player: _player);
-      }
-      tx.send(true);
+    }());
+  }
+
+  Future<bool> _handleEvent(UpdateState patch, VoidCallback callback) async {
+    if (patch.isFinal()) {
+      _player.rev = patch.rev;
+      return true;
     }
+    _player.rev = _state.applyUpdate(patch);
+    if (patch.confirm) {
+      await _client.confirm(player: _player);
+    }
+    callback();
+    return false;
   }
 }

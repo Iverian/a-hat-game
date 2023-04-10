@@ -17,13 +17,44 @@ import "rpc/state_game_listeners.dart";
 
 const kNameKey = "X-Name";
 
+// TODO: implement other stages
+enum GameStage {
+  inactive,
+  creating,
+  lobby,
+  preparing,
+  round,
+  finished,
+  notSet,
+}
+
 class GameStateNotifier extends ChangeNotifier {
   _InnerState? _state;
+  GameStage? _stage;
 
-  GameStateNotifier();
+  GameStateNotifier() : _stage = GameStage.inactive;
 
   bool get isActive => _state != null;
-  GameState get state => _state!.state;
+
+  GameStage get stage {
+    if (_stage == null) {
+      switch (_state!.inner.whichStage()) {
+        case GameState_Stage.lobby:
+          return GameStage.lobby;
+        case GameState_Stage.preparing:
+          return GameStage.preparing;
+        case GameState_Stage.round:
+          return GameStage.round;
+        case GameState_Stage.finished:
+          return GameStage.finished;
+        case GameState_Stage.notSet:
+          return GameStage.creating;
+      }
+    }
+    return _stage!;
+  }
+
+  GameState get state => _state!.inner;
 
   Future<void> create({
     required String name,
@@ -31,36 +62,29 @@ class GameStateNotifier extends ChangeNotifier {
     required Settings settings,
   }) async {
     assert(_state == null, "invalid game state transition");
+    _stage = GameStage.creating;
 
-    final id = await nanoid();
-    final port = await _assignPort();
-    final result = await spawnHost(
-      hostPlayerName: playerName,
-      port: port,
-      settings: settings,
-    );
-    final handle = _HostHandle(
-      close: result.close,
-      hostRegistration: await _registerService(
-        id: id,
-        name: name,
+    unawaited(() async {
+      final id = await nanoid();
+      final port = await _assignPort();
+      final result = await spawnHost(
+        hostPlayerName: playerName,
         port: port,
-      ),
-    );
+        settings: settings,
+      );
+      final handle = _HostHandle(
+        close: result.close,
+        hostRegistration: await _registerService(
+          id: id,
+          name: name,
+          port: port,
+        ),
+      );
 
-    // TODO: find better solution
-    final rx = ReceivePort();
-    unawaited(result.listener.listen(rx.sendPort));
-    unawaited(
-      () async {
-        await for (final _ in rx) {
-          dev.log("received state update");
-          notifyListeners();
-        }
-      }(),
-    );
-
-    _state = _InnerState(listener: result.listener, host: handle);
+      _state = _InnerState(listener: result.listener, host: handle);
+      _stage = null;
+      await result.listener.createListener(notifyListeners);
+    }());
   }
 
   Future<void> exit() async {
@@ -137,7 +161,7 @@ class _InnerState {
 
   _InnerState({required this.listener, this.host});
 
-  GameState get state => listener.state;
+  GameState get inner => listener.state;
 
   Future<void> onExit() async {
     await host?.onExit();

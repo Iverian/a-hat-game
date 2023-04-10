@@ -15,5 +15,5 @@ abstract class GameStateListener {
   GameState get state;
   int get playerId;
   ListenerRole get role;
-  Future<void> listen(SendPort tx);
+  Future<void> createListener(VoidCallback callback);
 }
