@@ -9,12 +9,19 @@ import "game_server.dart";
 
 class GrpcJoinService extends JoinServiceBase {
   final LocalGameClient client;
+  final String? code;
 
-  GrpcJoinService({required this.client});
+  GrpcJoinService({required this.client, required this.code});
 
   @override
   Future<LobbyJoinResponse> lobbyJoin(ServiceCall call, LobbyJoinRequest request) async {
     final response = LobbyJoinResponse()..clearResult();
+    if (code != null) {
+      if (!request.hasCode() || !_secureCompare(code!, request.code)) {
+        return response..err = ProtocolError(code: ErrorCode.INVALID_LOBBY_CODE);
+      }
+    }
+
     try {
       final playerId = await client.lobbyJoin(playerName: request.playerName);
       return response..ok = playerId;
@@ -132,4 +139,16 @@ Future<FallibleResponse> _wrapRequest(
   } on RpcError catch (e) {
     return response..err = e.toProtocolError();
   }
+}
+
+bool _secureCompare(String a, String b) {
+  if (a.codeUnits.length != b.codeUnits.length) {
+    return false;
+  }
+
+  var r = 0;
+  for (int i = 0; i < a.codeUnits.length; i++) {
+    r |= a.codeUnitAt(i) ^ b.codeUnitAt(i);
+  }
+  return r == 0;
 }

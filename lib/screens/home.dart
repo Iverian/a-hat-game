@@ -91,7 +91,7 @@ class HomePage extends ConsumerWidget {
         onTap: () async => navPush(
           context,
           (_) {
-            const next = JoinGameScreen();
+            final next = JoinGameScreen();
             return nameIsEmpty ? PlayerNameScreen(next: (_) => next) : next;
           },
         ),
@@ -106,7 +106,7 @@ class HomePage extends ConsumerWidget {
             if (Navigator.of(context).widget.pages.length > 1) {
               navPop(context);
             } else {
-              await navPush(context, (_) => const GameScreen());
+              await navPush(context, (_) => GameScreen());
             }
           },
         ),
@@ -116,7 +116,7 @@ class HomePage extends ConsumerWidget {
         MainMenuItem(
           title: "ВЫЙТИ ИЗ ИГРЫ",
           onTap: () async {
-            await ref.read(gamePod).exit();
+            ref.read(gamePod).exit();
           },
         ),
       ];

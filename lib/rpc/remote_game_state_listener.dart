@@ -1,10 +1,12 @@
 import "dart:async";
 import "dart:developer" as dev;
+import "dart:ui";
 
 import "package:async/async.dart";
-import "package:flutter/foundation.dart";
+import "package:grpc/grpc.dart";
 
-import "../generated/proto/service.pb.dart";
+import "../generated/proto/error.pb.dart";
+import "../generated/proto/service.pbgrpc.dart";
 import "../generated/proto/state.pb.dart";
 import "error.dart";
 import "game_event_ext.dart";
@@ -12,33 +14,33 @@ import "game_server.dart";
 import "game_state_listener.dart";
 import "game_state_manager.dart";
 
-class LocalGameStateListener implements GameStateListener {
-  final LocalGameClient _client;
-  final GameStateManager _state;
+class RemoteGameStateListener implements GameStateListener {
   final PlayerMetadata _player;
+  final GameClient _client;
+  final GameStateManager _state;
 
-  LocalGameStateListener({
+  RemoteGameStateListener({
     required int playerId,
-    required LocalGameClient client,
-  })  : _client = client,
-        _state = GameStateManager(),
-        _player = PlayerMetadata.fromId(playerId: playerId);
-
-  @override
-  GameState get state => _state.inner;
+    required GameClient client,
+  })  : _player = PlayerMetadata.fromId(playerId: playerId),
+        _client = client,
+        _state = GameStateManager();
 
   @override
   int get playerId => _player.playerId;
 
   @override
-  ListenerRole get role => ListenerRole.host;
+  ListenerRole get role => ListenerRole.client;
+
+  @override
+  GameState get state => _state.inner;
 
   @override
   void createListener(VoidCallback callback) {
     unawaited(_listen(callback));
   }
 
-  // TODO: deduplicate with remote_listener
+  // TODO: deduplicate with local_listener
   Future<void> _listen(VoidCallback callback) async {
     while (true) {
       try {
@@ -53,7 +55,8 @@ class LocalGameStateListener implements GameStateListener {
   }
 
   Future<void> _handleEvents(VoidCallback callback) async {
-    final q = StreamQueue(_client.subscribe(player: _player));
+    final resp = _client.subscribe(Empty(), options: _setCallOptions());
+    final q = StreamQueue(resp);
 
     final handshakeMsg = await q.next;
     if (handshakeMsg.handshake.whichResult() == FallibleResponse_Result.err) {
@@ -76,7 +79,7 @@ class LocalGameStateListener implements GameStateListener {
               "updating state of ${_player.playerId} to rev ${event.patch.patch.rev}: ${event.patch.patch}");
           _player.rev = _state.apply(event.patch.patch);
           if (event.needsConfirm()) {
-            await _client.confirm(player: _player);
+            await _client.confirm(Empty(), options: _setCallOptions());
             final ack = await q.next;
             if (!ack.isAck()) {
               throw RpcError();
@@ -91,4 +94,6 @@ class LocalGameStateListener implements GameStateListener {
       }
     }
   }
+
+  CallOptions _setCallOptions() => CallOptions(metadata: _player.toGrpc());
 }

@@ -9,10 +9,176 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'state.pb.dart' as $2;
 import 'error.pb.dart' as $1;
+import 'state.pb.dart' as $2;
 
 import 'state.pbenum.dart' as $2;
+
+class LobbyJoinRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LobbyJoinRequest',
+      package: const $pb.PackageName(
+          $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.service'),
+      createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'playerName')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code')
+    ..hasRequiredFields = false;
+
+  LobbyJoinRequest._() : super();
+  factory LobbyJoinRequest({
+    $core.String? playerName,
+    $core.String? code,
+  }) {
+    final _result = create();
+    if (playerName != null) {
+      _result.playerName = playerName;
+    }
+    if (code != null) {
+      _result.code = code;
+    }
+    return _result;
+  }
+  factory LobbyJoinRequest.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory LobbyJoinRequest.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  LobbyJoinRequest clone() => LobbyJoinRequest()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  LobbyJoinRequest copyWith(void Function(LobbyJoinRequest) updates) =>
+      super.copyWith((message) => updates(message as LobbyJoinRequest))
+          as LobbyJoinRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static LobbyJoinRequest create() => LobbyJoinRequest._();
+  LobbyJoinRequest createEmptyInstance() => create();
+  static $pb.PbList<LobbyJoinRequest> createRepeated() => $pb.PbList<LobbyJoinRequest>();
+  @$core.pragma('dart2js:noInline')
+  static LobbyJoinRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LobbyJoinRequest>(create);
+  static LobbyJoinRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get playerName => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set playerName($core.String v) {
+    $_setString(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasPlayerName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPlayerName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get code => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set code($core.String v) {
+    $_setString(1, v);
+  }
+
+  @$pb.TagNumber(2)
+  $core.bool hasCode() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCode() => clearField(2);
+}
+
+enum LobbyJoinResponse_Result { ok, err, notSet }
+
+class LobbyJoinResponse extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, LobbyJoinResponse_Result> _LobbyJoinResponse_ResultByTag = {
+    1: LobbyJoinResponse_Result.ok,
+    2: LobbyJoinResponse_Result.err,
+    0: LobbyJoinResponse_Result.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LobbyJoinResponse',
+      package: const $pb.PackageName(
+          $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.service'),
+      createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ok',
+        $pb.PbFieldType.OF3)
+    ..aOM<$1.ProtocolError>(
+        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'err',
+        subBuilder: $1.ProtocolError.create)
+    ..hasRequiredFields = false;
+
+  LobbyJoinResponse._() : super();
+  factory LobbyJoinResponse({
+    $core.int? ok,
+    $1.ProtocolError? err,
+  }) {
+    final _result = create();
+    if (ok != null) {
+      _result.ok = ok;
+    }
+    if (err != null) {
+      _result.err = err;
+    }
+    return _result;
+  }
+  factory LobbyJoinResponse.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory LobbyJoinResponse.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  LobbyJoinResponse clone() => LobbyJoinResponse()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  LobbyJoinResponse copyWith(void Function(LobbyJoinResponse) updates) =>
+      super.copyWith((message) => updates(message as LobbyJoinResponse))
+          as LobbyJoinResponse; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static LobbyJoinResponse create() => LobbyJoinResponse._();
+  LobbyJoinResponse createEmptyInstance() => create();
+  static $pb.PbList<LobbyJoinResponse> createRepeated() => $pb.PbList<LobbyJoinResponse>();
+  @$core.pragma('dart2js:noInline')
+  static LobbyJoinResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LobbyJoinResponse>(create);
+  static LobbyJoinResponse? _defaultInstance;
+
+  LobbyJoinResponse_Result whichResult() => _LobbyJoinResponse_ResultByTag[$_whichOneof(0)]!;
+  void clearResult() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  $core.int get ok => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set ok($core.int v) {
+    $_setUnsignedInt32(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasOk() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearOk() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $1.ProtocolError get err => $_getN(1);
+  @$pb.TagNumber(2)
+  set err($1.ProtocolError v) {
+    setField(2, v);
+  }
+
+  @$pb.TagNumber(2)
+  $core.bool hasErr() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearErr() => clearField(2);
+  @$pb.TagNumber(2)
+  $1.ProtocolError ensureErr() => $_ensure(1);
+}
 
 enum GameEvent_Kind { handshake, shutdown, ack, rewind, patch, notSet }
 
@@ -448,155 +614,6 @@ class FallibleResponse extends $pb.GeneratedMessage {
   void clearOk() => clearField(1);
   @$pb.TagNumber(1)
   $1.Empty ensureOk() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $1.ProtocolError get err => $_getN(1);
-  @$pb.TagNumber(2)
-  set err($1.ProtocolError v) {
-    setField(2, v);
-  }
-
-  @$pb.TagNumber(2)
-  $core.bool hasErr() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearErr() => clearField(2);
-  @$pb.TagNumber(2)
-  $1.ProtocolError ensureErr() => $_ensure(1);
-}
-
-class LobbyJoinRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LobbyJoinRequest',
-      package: const $pb.PackageName(
-          $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.service'),
-      createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'playerName')
-    ..hasRequiredFields = false;
-
-  LobbyJoinRequest._() : super();
-  factory LobbyJoinRequest({
-    $core.String? playerName,
-  }) {
-    final _result = create();
-    if (playerName != null) {
-      _result.playerName = playerName;
-    }
-    return _result;
-  }
-  factory LobbyJoinRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory LobbyJoinRequest.fromJson($core.String i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
-  LobbyJoinRequest clone() => LobbyJoinRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  LobbyJoinRequest copyWith(void Function(LobbyJoinRequest) updates) =>
-      super.copyWith((message) => updates(message as LobbyJoinRequest))
-          as LobbyJoinRequest; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static LobbyJoinRequest create() => LobbyJoinRequest._();
-  LobbyJoinRequest createEmptyInstance() => create();
-  static $pb.PbList<LobbyJoinRequest> createRepeated() => $pb.PbList<LobbyJoinRequest>();
-  @$core.pragma('dart2js:noInline')
-  static LobbyJoinRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LobbyJoinRequest>(create);
-  static LobbyJoinRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get playerName => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set playerName($core.String v) {
-    $_setString(0, v);
-  }
-
-  @$pb.TagNumber(1)
-  $core.bool hasPlayerName() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearPlayerName() => clearField(1);
-}
-
-enum LobbyJoinResponse_Result { ok, err, notSet }
-
-class LobbyJoinResponse extends $pb.GeneratedMessage {
-  static const $core.Map<$core.int, LobbyJoinResponse_Result> _LobbyJoinResponse_ResultByTag = {
-    1: LobbyJoinResponse_Result.ok,
-    2: LobbyJoinResponse_Result.err,
-    0: LobbyJoinResponse_Result.notSet
-  };
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LobbyJoinResponse',
-      package: const $pb.PackageName(
-          $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.service'),
-      createEmptyInstance: create)
-    ..oo(0, [1, 2])
-    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ok',
-        $pb.PbFieldType.OF3)
-    ..aOM<$1.ProtocolError>(
-        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'err',
-        subBuilder: $1.ProtocolError.create)
-    ..hasRequiredFields = false;
-
-  LobbyJoinResponse._() : super();
-  factory LobbyJoinResponse({
-    $core.int? ok,
-    $1.ProtocolError? err,
-  }) {
-    final _result = create();
-    if (ok != null) {
-      _result.ok = ok;
-    }
-    if (err != null) {
-      _result.err = err;
-    }
-    return _result;
-  }
-  factory LobbyJoinResponse.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory LobbyJoinResponse.fromJson($core.String i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
-  LobbyJoinResponse clone() => LobbyJoinResponse()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  LobbyJoinResponse copyWith(void Function(LobbyJoinResponse) updates) =>
-      super.copyWith((message) => updates(message as LobbyJoinResponse))
-          as LobbyJoinResponse; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static LobbyJoinResponse create() => LobbyJoinResponse._();
-  LobbyJoinResponse createEmptyInstance() => create();
-  static $pb.PbList<LobbyJoinResponse> createRepeated() => $pb.PbList<LobbyJoinResponse>();
-  @$core.pragma('dart2js:noInline')
-  static LobbyJoinResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LobbyJoinResponse>(create);
-  static LobbyJoinResponse? _defaultInstance;
-
-  LobbyJoinResponse_Result whichResult() => _LobbyJoinResponse_ResultByTag[$_whichOneof(0)]!;
-  void clearResult() => clearField($_whichOneof(0));
-
-  @$pb.TagNumber(1)
-  $core.int get ok => $_getIZ(0);
-  @$pb.TagNumber(1)
-  set ok($core.int v) {
-    $_setUnsignedInt32(0, v);
-  }
-
-  @$pb.TagNumber(1)
-  $core.bool hasOk() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearOk() => clearField(1);
 
   @$pb.TagNumber(2)
   $1.ProtocolError get err => $_getN(1);

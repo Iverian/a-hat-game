@@ -24,6 +24,8 @@ class ErrorCode extends $pb.ProtobufEnum {
       5, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'PLAYER_NOT_FOUND');
   static const ErrorCode INVALID_CHARACTER_DATA = ErrorCode._(
       6, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INVALID_CHARACTER_DATA');
+  static const ErrorCode INVALID_LOBBY_CODE = ErrorCode._(
+      7, $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INVALID_LOBBY_CODE');
 
   static const $core.List<ErrorCode> values = <ErrorCode>[
     OTHER,
@@ -33,6 +35,7 @@ class ErrorCode extends $pb.ProtobufEnum {
     PLAYER_NAME_TAKEN,
     PLAYER_NOT_FOUND,
     INVALID_CHARACTER_DATA,
+    INVALID_LOBBY_CODE,
   ];
 
   static final $core.Map<$core.int, ErrorCode> _byValue = $pb.ProtobufEnum.initByValue(values);

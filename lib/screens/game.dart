@@ -9,19 +9,31 @@ import "../provider.dart";
 import "lobby.dart";
 
 // Родитель всех игровых экранов, определяет корректный экран динамически из игрового состояния
-class GameScreen extends ConsumerWidget {
-  const GameScreen({super.key});
+// class GameScreen extends ConsumerWidget {
+//   const GameScreen({super.key});
 
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+
+//   }
+// }
+
+class GameScreen extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  @override
+  Widget build(BuildContext context) {
     final stage = ref.watch(gamePod.select((value) => value.stage));
 
     dev.log("stage = $stage");
     switch (stage) {
       case GameStage.lobby:
-        return const LobbyScreen();
+        return LobbyScreen();
       // TODO: better solution?
-      case GameStage.creating:
+      case GameStage.loading:
         return Scaffold(
           body: Center(
             child: LoadingAnimationWidget.bouncingBall(

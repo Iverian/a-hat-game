@@ -14,8 +14,8 @@ import "game_state_ext.dart";
 import "game_state_manager.dart";
 import "util.dart";
 
-const kGrpcPlayerId = "X-Player-Id";
-const kGrpcRev = "X-Revision";
+const kGrpcPlayerId = "x-player-id";
+const kGrpcRev = "x-revision";
 
 class PlayerMetadata {
   final int playerId;
@@ -134,14 +134,13 @@ class GameServer {
   Future<void> _subscribe(_SubscribeData data) async {
     _state.ensurePlayerPresent(data.player.playerId);
     await _listeners.add(data.player.playerId, () {
-      if (data.player.rev != _state.rev) {
-        data.tx.send(GameEventExt.doRewind(_state.inner));
-      }
+      final rewind = GameEventExt.doRewind(_state.inner);
+      dev.log("sending rewind to ${data.player.playerId}: $rewind");
+      data.tx.send(rewind);
       return data.tx;
     });
 
-    final patch = _state.tryUpdatePlayerConnected(data.player.playerId);
-    if (patch != null) {
+    for (final patch in _state.tryUpdatePlayerConnected(data.player.playerId)) {
       await _notifyAllPatch(patch);
     }
   }

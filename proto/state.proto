@@ -20,6 +20,7 @@ message GameState {
 message Player {
   PlayerStatus status = 1;
   string name = 2;
+  string slug = 3;
 }
 
 enum PlayerStatus {

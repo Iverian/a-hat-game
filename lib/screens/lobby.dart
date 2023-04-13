@@ -1,42 +1,51 @@
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
-class LobbyScreen extends ConsumerStatefulWidget {
-  const LobbyScreen({super.key});
+import "../provider.dart";
 
+class LobbyScreen extends ConsumerStatefulWidget {
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LobbyScreenState();
+  ConsumerState<LobbyScreen> createState() => _LobbyScreenState();
 }
 
 class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   @override
-  Widget build(BuildContext context) => DefaultTabController(
-        length: 3,
-        initialIndex: 1,
-        child: Scaffold(
-          body: Stack(
-            children: [
-              const TabBarView(
-                children: [
-                  Text("1"),
-                  Text("2"),
-                  Text("3"),
-                ],
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 40,
-                child: Container(
-                  height: 40,
-                  color: Colors.black12,
-                  alignment: Alignment.center,
-                  child: const TabPageSelector(),
-                ),
-              )
+  Widget build(BuildContext context) {
+    final players = ref.watch(gamePod.select((value) => value.state.players));
+    final myPlayerId = ref.watch(gamePod.select((value) => value.playerId));
+
+    return DefaultTabController(
+      length: 3,
+      initialIndex: 1,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const TabBar(
+            tabs: <Widget>[
+              Tab(icon: Icon(Icons.person_add)),
+              Tab(icon: Icon(Icons.list)),
+              Tab(icon: Icon(Icons.contacts)),
             ],
           ),
         ),
-      );
+        body: TabBarView(
+          children: <Widget>[
+            const Center(child: Text("1")),
+            Center(
+              child: ListView(
+                children: players.entries
+                    .map(
+                      (e) => ListTile(
+                        title: Text("${e.value.name}#${e.value.slug}"),
+                        subtitle: myPlayerId == e.key ? const Text("(me)") : null,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            const Center(child: Text("3")),
+          ],
+        ),
+      ),
+    );
+  }
 }

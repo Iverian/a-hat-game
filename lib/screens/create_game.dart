@@ -44,6 +44,7 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                     if (!_formKey.currentState!.validate()) {
                       return;
                     }
+
                     ref.read(gamePod).create(
                           name: _controller.text,
                           playerName: ref.read(pNamePod),
@@ -52,8 +53,10 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                             characterCount: 4,
                             turnDurationS: 60,
                           ),
+                          // TODO: make configurable
+                          isPrivate: false,
                         );
-                    await navReplace(context, (_) => const GameScreen());
+                    await navReplace(context, (_) => GameScreen());
                   },
                 )
               ],

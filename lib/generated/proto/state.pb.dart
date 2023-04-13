@@ -237,12 +237,14 @@ class Player extends $pb.GeneratedMessage {
         valueOf: PlayerStatus.valueOf,
         enumValues: PlayerStatus.values)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'slug')
     ..hasRequiredFields = false;
 
   Player._() : super();
   factory Player({
     PlayerStatus? status,
     $core.String? name,
+    $core.String? slug,
   }) {
     final _result = create();
     if (status != null) {
@@ -250,6 +252,9 @@ class Player extends $pb.GeneratedMessage {
     }
     if (name != null) {
       _result.name = name;
+    }
+    if (slug != null) {
+      _result.slug = slug;
     }
     return _result;
   }
@@ -302,6 +307,18 @@ class Player extends $pb.GeneratedMessage {
   $core.bool hasName() => $_has(1);
   @$pb.TagNumber(2)
   void clearName() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get slug => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set slug($core.String v) {
+    $_setString(2, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasSlug() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSlug() => clearField(3);
 }
 
 class Settings extends $pb.GeneratedMessage {

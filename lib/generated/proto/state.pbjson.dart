@@ -107,12 +107,13 @@ const Player$json = {
   '2': [
     {'1': 'status', '3': 1, '4': 1, '5': 14, '6': '.hat_game.state.PlayerStatus', '10': 'status'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'slug', '3': 3, '4': 1, '5': 9, '10': 'slug'},
   ],
 };
 
 /// Descriptor for `Player`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List playerDescriptor = $convert.base64Decode(
-    'CgZQbGF5ZXISNAoGc3RhdHVzGAEgASgOMhwuaGF0X2dhbWUuc3RhdGUuUGxheWVyU3RhdHVzUgZzdGF0dXMSEgoEbmFtZRgCIAEoCVIEbmFtZQ==');
+    'CgZQbGF5ZXISNAoGc3RhdHVzGAEgASgOMhwuaGF0X2dhbWUuc3RhdGUuUGxheWVyU3RhdHVzUgZzdGF0dXMSEgoEbmFtZRgCIAEoCVIEbmFtZRISCgRzbHVnGAMgASgJUgRzbHVn');
 @$core.Deprecated('Use settingsDescriptor instead')
 const Settings$json = {
   '1': 'Settings',

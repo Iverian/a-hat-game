@@ -9,6 +9,44 @@ import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use lobbyJoinRequestDescriptor instead')
+const LobbyJoinRequest$json = {
+  '1': 'LobbyJoinRequest',
+  '2': [
+    {'1': 'player_name', '3': 1, '4': 1, '5': 9, '10': 'playerName'},
+    {'1': 'code', '3': 2, '4': 1, '5': 9, '9': 0, '10': 'code', '17': true},
+  ],
+  '8': [
+    {'1': '_code'},
+  ],
+};
+
+/// Descriptor for `LobbyJoinRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List lobbyJoinRequestDescriptor = $convert.base64Decode(
+    'ChBMb2JieUpvaW5SZXF1ZXN0Eh8KC3BsYXllcl9uYW1lGAEgASgJUgpwbGF5ZXJOYW1lEhcKBGNvZGUYAiABKAlIAFIEY29kZYgBAUIHCgVfY29kZQ==');
+@$core.Deprecated('Use lobbyJoinResponseDescriptor instead')
+const LobbyJoinResponse$json = {
+  '1': 'LobbyJoinResponse',
+  '2': [
+    {'1': 'ok', '3': 1, '4': 1, '5': 7, '9': 0, '10': 'ok'},
+    {
+      '1': 'err',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.error.ProtocolError',
+      '9': 0,
+      '10': 'err'
+    },
+  ],
+  '8': [
+    {'1': 'result'},
+  ],
+};
+
+/// Descriptor for `LobbyJoinResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List lobbyJoinResponseDescriptor = $convert.base64Decode(
+    'ChFMb2JieUpvaW5SZXNwb25zZRIQCgJvaxgBIAEoB0gAUgJvaxIxCgNlcnIYAiABKAsyHS5oYXRfZ2FtZS5lcnJvci5Qcm90b2NvbEVycm9ySABSA2VyckIICgZyZXN1bHQ=');
 @$core.Deprecated('Use gameEventDescriptor instead')
 const GameEvent$json = {
   '1': 'GameEvent',
@@ -118,40 +156,6 @@ const FallibleResponse$json = {
 /// Descriptor for `FallibleResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List fallibleResponseDescriptor = $convert.base64Decode(
     'ChBGYWxsaWJsZVJlc3BvbnNlEicKAm9rGAEgASgLMhUuaGF0X2dhbWUuZXJyb3IuRW1wdHlIAFICb2sSMQoDZXJyGAIgASgLMh0uaGF0X2dhbWUuZXJyb3IuUHJvdG9jb2xFcnJvckgAUgNlcnJCCAoGcmVzdWx0');
-@$core.Deprecated('Use lobbyJoinRequestDescriptor instead')
-const LobbyJoinRequest$json = {
-  '1': 'LobbyJoinRequest',
-  '2': [
-    {'1': 'player_name', '3': 1, '4': 1, '5': 9, '10': 'playerName'},
-  ],
-};
-
-/// Descriptor for `LobbyJoinRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List lobbyJoinRequestDescriptor =
-    $convert.base64Decode('ChBMb2JieUpvaW5SZXF1ZXN0Eh8KC3BsYXllcl9uYW1lGAEgASgJUgpwbGF5ZXJOYW1l');
-@$core.Deprecated('Use lobbyJoinResponseDescriptor instead')
-const LobbyJoinResponse$json = {
-  '1': 'LobbyJoinResponse',
-  '2': [
-    {'1': 'ok', '3': 1, '4': 1, '5': 7, '9': 0, '10': 'ok'},
-    {
-      '1': 'err',
-      '3': 2,
-      '4': 1,
-      '5': 11,
-      '6': '.hat_game.error.ProtocolError',
-      '9': 0,
-      '10': 'err'
-    },
-  ],
-  '8': [
-    {'1': 'result'},
-  ],
-};
-
-/// Descriptor for `LobbyJoinResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List lobbyJoinResponseDescriptor = $convert.base64Decode(
-    'ChFMb2JieUpvaW5SZXNwb25zZRIQCgJvaxgBIAEoB0gAUgJvaxIxCgNlcnIYAiABKAsyHS5oYXRfZ2FtZS5lcnJvci5Qcm90b2NvbEVycm9ySABSA2VyckIICgZyZXN1bHQ=');
 @$core.Deprecated('Use lobbyPlayerReadyRequestDescriptor instead')
 const LobbyPlayerReadyRequest$json = {
   '1': 'LobbyPlayerReadyRequest',

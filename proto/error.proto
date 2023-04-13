@@ -10,6 +10,7 @@ enum ErrorCode {
   PLAYER_NAME_TAKEN = 4;
   PLAYER_NOT_FOUND = 5;
   INVALID_CHARACTER_DATA = 6;
+  INVALID_LOBBY_CODE = 7;
 }
 
 message ProtocolError { ErrorCode code = 1; }

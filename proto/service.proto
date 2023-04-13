@@ -8,6 +8,18 @@ service Join {
   rpc LobbyJoin(LobbyJoinRequest) returns (LobbyJoinResponse) {}
 }
 
+message LobbyJoinRequest {
+  string player_name = 1;
+  optional string code = 2;
+}
+
+message LobbyJoinResponse {
+  oneof result {
+    fixed32 ok = 1;
+    hat_game.error.ProtocolError err = 2;
+  }
+}
+
 service Game {
   rpc Subscribe(hat_game.error.Empty) returns (stream GameEvent) {}
   rpc Confirm(hat_game.error.Empty) returns (FallibleResponse) {}
@@ -43,15 +55,6 @@ message EventPatch { hat_game.state.GameStatePatch patch = 1; }
 message FallibleResponse {
   oneof result {
     hat_game.error.Empty ok = 1;
-    hat_game.error.ProtocolError err = 2;
-  }
-}
-
-message LobbyJoinRequest { string player_name = 1; }
-
-message LobbyJoinResponse {
-  oneof result {
-    fixed32 ok = 1;
     hat_game.error.ProtocolError err = 2;
   }
 }

@@ -7,7 +7,7 @@ import "package:grpc/grpc_connection_interface.dart";
 
 import "../generated/proto/state.pb.dart";
 import "game_server.dart";
-import 'game_state_listener.dart';
+import "game_state_listener.dart";
 import "game_state_manager.dart";
 import "grpc_server.dart";
 import "local_game_state_listener.dart";
@@ -32,9 +32,10 @@ class CloseHandle {
 }
 
 Future<SpawnHostResult> spawnHost({
-  required String hostPlayerName,
+  required String playerName,
   required int port,
   required Settings settings,
+  required String? code,
 }) async {
   final rx = ReceivePort();
   await Isolate.spawn(
@@ -42,8 +43,9 @@ Future<SpawnHostResult> spawnHost({
     _DoSpawnHostRequest(
       tx: rx.sendPort,
       port: port,
-      hostPlayerName: hostPlayerName,
+      hostPlayerName: playerName,
       settings: settings,
+      code: code,
     ),
   );
 
@@ -62,12 +64,14 @@ class _DoSpawnHostRequest {
   final int port;
   final String hostPlayerName;
   final Settings settings;
+  final String? code;
 
   _DoSpawnHostRequest({
     required this.tx,
     required this.port,
     required this.hostPlayerName,
     required this.settings,
+    required this.code,
   });
 }
 
@@ -89,7 +93,7 @@ Future<void> _doSpawnHost(_DoSpawnHostRequest request) async {
   final server = GameServer(state: state);
   final grpcServer = grpc.Server(
     [
-      GrpcJoinService(client: server.getClient()),
+      GrpcJoinService(client: server.getClient(), code: request.code),
       GrpcGameService(client: server.getClient()),
     ],
     [],

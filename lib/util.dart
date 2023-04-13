@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 
 final _emptyPattern = RegExp(r"^\s+$");
 final _whitespaceStartPattern = RegExp(r"^\s+");
+
 const _nameMaxLength = 31;
 
 Future<dynamic> navPush(BuildContext context, Widget Function(BuildContext) builder) =>

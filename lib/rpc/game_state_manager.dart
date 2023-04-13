@@ -4,21 +4,19 @@ import "dart:math";
 
 import "package:fixnum/fixnum.dart";
 import "package:tuple/tuple.dart";
-
+import "package:nanoid/nanoid.dart" as nanoid;
 import "../generated/proto/state.pb.dart";
 import "error.dart";
 import "game_state_ext.dart";
 
 const int kInt32Max = 0x7fffffff;
 const int kFirstRev = 1;
+const String kPlayerSlugAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 class GameStateManager {
-  final Random rng;
   GameState inner;
 
-  GameStateManager()
-      : inner = GameState(rev: 0),
-        rng = Random.secure();
+  GameStateManager() : inner = GameState(rev: 0);
 
   factory GameStateManager.fromClient({required GameState state}) =>
       GameStateManager()..inner = state;
@@ -28,12 +26,15 @@ class GameStateManager {
     required String playerName,
   }) {
     final result = GameStateManager();
-    final hostId = result._generatePlayerId();
+    final hostId = result._generatePlayerIds(playerName);
     result.inner
       ..rev = kFirstRev
-      // TODO: handle connection status
-      ..players[hostId] = Player(status: PlayerStatus.CONNECTED, name: playerName)
-      ..hostId = hostId
+      ..players[hostId.id] = Player(
+        status: PlayerStatus.JOINING,
+        name: playerName,
+        slug: hostId.slug,
+      )
+      ..hostId = hostId.id
       ..settings = settings
       ..clearStage()
       ..lobby = Lobby.create();
@@ -50,34 +51,38 @@ class GameStateManager {
   }
 
   Tuple2<int, GameStatePatch> updateLobbyJoin(String playerName) {
-    final playerId = _generatePlayerId();
+    final playerId = _generatePlayerIds(playerName);
     return Tuple2(
-      playerId,
-      _applyImpl(
+      playerId.id,
+      _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..playerJoined = DoPlayerJoined(
-            playerId: playerId,
+            playerId: playerId.id,
             // TODO: handle connection status
-            player: Player(status: PlayerStatus.CONNECTED, name: playerName),
+            player: Player(
+              status: PlayerStatus.JOINING,
+              name: playerName,
+              slug: playerId.slug,
+            ),
           ),
       ),
     );
   }
 
-  GameStatePatch updateLobbyLeave(int playerId) => _applyImpl(
+  GameStatePatch updateLobbyLeave(int playerId) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..playerLeft = DoPlayerLeft(playerId: playerId),
       );
 
-  GameStatePatch updateLobbyPlayerReady(int playerId, List<Character> characters) => _applyImpl(
+  GameStatePatch updateLobbyPlayerReady(int playerId, List<Character> characters) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..playerReady = DoPlayerReady(playerId: playerId, characters: characters),
       );
 
-  GameStatePatch updateLobbyPlayerNotReady(int playerId) => _applyImpl(
+  GameStatePatch updateLobbyPlayerNotReady(int playerId) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..playerNotReady = DoPlayerNotReady(playerId: playerId),
@@ -86,6 +91,7 @@ class GameStateManager {
   GameStatePatch updateLobbyPrepareStartGame() {
     _ensureGameStart();
 
+    final rng = Random.secure();
     final players = inner.players.keys.toList()..shuffle(rng);
     final teamsTotal = players.length ~/ 2;
     final teams = List<Team>.empty(growable: true);
@@ -103,46 +109,46 @@ class GameStateManager {
       );
     }
 
-    return _applyImpl(
+    return _applyServer(
       _makePatch(confirm: true)
         ..clearKind()
         ..prepareStart = DoPrepareStart(teams: TeamList(value: teams)),
     );
   }
 
-  GameStatePatch updateLobbyStartGame() => _applyImpl(
+  GameStatePatch updateLobbyStartGame() => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..roundNext = DoNextRound(roundIndex: 0),
       );
 
-  GameStatePatch? tryUpdatePlayerConnected(int playerId) {
+  List<GameStatePatch> tryUpdatePlayerConnected(int playerId) {
     ensurePlayerPresent(playerId);
     if (inner.players[playerId]!.status == PlayerStatus.CONNECTED) {
-      return null;
+      return [];
     }
-    return updatePlayerConnected(playerId);
+    return [updatePlayerConnected(playerId)];
   }
 
-  GameStatePatch updatePlayerConnected(int playerId) => _applyImpl(
+  GameStatePatch updatePlayerConnected(int playerId) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..playerConnected = DoPlayerConnected(playerId: playerId),
       );
 
-  GameStatePatch updatePlayerDisconnected(int playerId) => _applyImpl(
+  GameStatePatch updatePlayerDisconnected(int playerId) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..playerDisconnected = DoPlayerDisconnected(playerId: playerId),
       );
 
-  GameStatePatch updateStartTurn() => _applyImpl(
+  GameStatePatch updateStartTurn() => _applyServer(
         _makePatch(confirm: true)
           ..clearKind()
           ..turnStart = DoStartTurn(),
       );
 
-  GameStatePatch updateEndTurn(TurnEndReason reason, List<Int64> guessed) => _applyImpl(
+  GameStatePatch updateEndTurn(TurnEndReason reason, List<Int64> guessed) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..turnEnd = DoEndTurn(
@@ -151,7 +157,7 @@ class GameStateManager {
           ),
       );
 
-  GameStatePatch updateCastVote(int playerId, List<CharacterVote> result) => _applyImpl(
+  GameStatePatch updateCastVote(int playerId, List<CharacterVote> result) => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
           ..votePlayer = DoPlayerVoted(
@@ -196,7 +202,7 @@ class GameStateManager {
           .toList(),
     );
 
-    return _applyImpl(
+    return _applyServer(
       _makePatch(confirm: false)
         ..clearKind()
         ..voteCount = DoVoteCount(result: result),
@@ -214,11 +220,10 @@ class GameStateManager {
         ..clearKind()
         ..turnNext = DoNextTurn(turnIndex: inner.round.turnIndex + 1);
     }
-    return _applyImpl(patch);
+    return _applyServer(patch);
   }
 
   int rewind(GameState state) {
-    dev.log("rewinding state to $state");
     inner = state;
     return inner.rev;
   }
@@ -237,25 +242,23 @@ class GameStateManager {
     return inner.rev;
   }
 
+  GameStatePatch _applyServer(GameStatePatch patch) {
+    dev.log("updating server state to rev ${patch.rev}: $patch");
+    return _applyImpl(patch);
+  }
+
   GameStatePatch _applyImpl(GameStatePatch patch) {
-    dev.log("applying update to rev = ${inner.rev}: $patch");
     switch (patch.whichKind()) {
-      case GameStatePatch_Kind.playerDisconnected:
-        ensurePlayerPresent(patch.playerDisconnected.playerId);
-        inner.players[patch.playerDisconnected.playerId]!.status = PlayerStatus.CONNECTED;
-        break;
       case GameStatePatch_Kind.playerConnected:
         ensurePlayerPresent(patch.playerConnected.playerId);
-        inner.players[patch.playerConnected.playerId]!.status = PlayerStatus.DISCONNECTED;
+        inner.players[patch.playerConnected.playerId]!.status = PlayerStatus.CONNECTED;
+        break;
+      case GameStatePatch_Kind.playerDisconnected:
+        ensurePlayerPresent(patch.playerDisconnected.playerId);
+        inner.players[patch.playerDisconnected.playerId]!.status = PlayerStatus.DISCONNECTED;
         break;
       case GameStatePatch_Kind.playerJoined:
         _ensureLobbyStage();
-        for (final i in inner.players.entries) {
-          if (i.value.name == patch.playerJoined.player.name) {
-            throw PlayerNameTakenError();
-          }
-        }
-
         inner.players[patch.playerJoined.playerId] = patch.playerJoined.player;
         break;
       case GameStatePatch_Kind.playerLeft:
@@ -505,12 +508,24 @@ class GameStateManager {
     }
   }
 
-  int _generatePlayerId() {
-    var result = rng.nextInt(kInt32Max);
-    while (inner.players.keys.contains(result)) {
-      result = rng.nextInt(kInt32Max);
+  // TODO: replace random slugs with last two bytes of player ip
+  // it can be extracted from grpc header :authority
+  _PlayerId _generatePlayerIds(String playerName) {
+    final rng = Random.secure();
+
+    var id = rng.nextInt(kInt32Max);
+    while (inner.players.keys.contains(id)) {
+      id = rng.nextInt(kInt32Max);
     }
-    return result;
+
+    final sameNameSlugs =
+        inner.players.values.where((e) => e.name == playerName).map((e) => e.slug).toList();
+    var slug = _playerSlug();
+    while (sameNameSlugs.contains(slug)) {
+      slug = _playerSlug();
+    }
+
+    return _PlayerId(id: id, slug: slug);
   }
 
   GameStatePatch _makePatch({required bool confirm}) => GameStatePatch(
@@ -519,7 +534,16 @@ class GameStateManager {
       );
 }
 
+class _PlayerId {
+  final int id;
+  final String slug;
+
+  _PlayerId({required this.id, required this.slug});
+}
+
 class _CharacterVoteCount {
   int playersVoted = 0;
   bool activePlayerVoted = false;
 }
+
+String _playerSlug() => nanoid.customAlphabet(kPlayerSlugAlphabet, 4);
