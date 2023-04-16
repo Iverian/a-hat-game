@@ -3,6 +3,7 @@ import "dart:developer" as dev;
 
 import "package:async/async.dart";
 import "package:flutter/material.dart";
+import "package:grpc/grpc.dart";
 import "package:mutex/mutex.dart";
 
 import "../generated/proto/service.pb.dart";
@@ -49,7 +50,12 @@ class GameClientStateNotifier {
         break;
       } on RpcError catch (e) {
         dev.log("unhandled rpc error: $e");
-        await Future.delayed(const Duration(seconds: 5));
+        await Future.delayed(const Duration(seconds: 1));
+        dev.log("reconnecting");
+      } on GrpcError catch (e) {
+        dev.log("unhandled grpc error: $e");
+        await Future.delayed(const Duration(seconds: 1));
+        dev.log("reconnecting");
       }
     }
   }
