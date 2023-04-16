@@ -28,7 +28,8 @@ extension $SplashRouteExtension on SplashRoute {
 
   void push(BuildContext context) => context.push(location);
 
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 }
 
 RouteBase get $mainMenuRoute => GoRouteData.$route(
@@ -61,11 +62,13 @@ extension $MainMenuRouteExtension on MainMenuRoute {
 
   void push(BuildContext context) => context.push(location);
 
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 }
 
 extension $PlayerNameRouteExtension on PlayerNameRoute {
-  static PlayerNameRoute _fromState(GoRouterState state) => const PlayerNameRoute();
+  static PlayerNameRoute _fromState(GoRouterState state) =>
+      const PlayerNameRoute();
 
   String get location => GoRouteData.$location(
         '/home/playerName',
@@ -75,11 +78,13 @@ extension $PlayerNameRouteExtension on PlayerNameRoute {
 
   void push(BuildContext context) => context.push(location);
 
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 }
 
 extension $CreateGameRouteExtension on CreateGameRoute {
-  static CreateGameRoute _fromState(GoRouterState state) => const CreateGameRoute();
+  static CreateGameRoute _fromState(GoRouterState state) =>
+      const CreateGameRoute();
 
   String get location => GoRouteData.$location(
         '/home/create',
@@ -89,7 +94,8 @@ extension $CreateGameRouteExtension on CreateGameRoute {
 
   void push(BuildContext context) => context.push(location);
 
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 }
 
 extension $JoinGameRouteExtension on JoinGameRoute {
@@ -103,7 +109,8 @@ extension $JoinGameRouteExtension on JoinGameRoute {
 
   void push(BuildContext context) => context.push(location);
 
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 }
 
 RouteBase get $lobbyRoute => GoRouteData.$route(
@@ -122,5 +129,6 @@ extension $LobbyRouteExtension on LobbyRoute {
 
   void push(BuildContext context) => context.push(location);
 
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 }

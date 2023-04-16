@@ -6,15 +6,17 @@ part of 'router_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$routerNotifierHash() => r'6807b13b291f7b733e78db417543d06f698f6b6c';
+String _$routerNotifierHash() => r'bae37246a870452d0e3dd7b12b638d6d705218b7';
 
 /// See also [RouterNotifier].
 @ProviderFor(RouterNotifier)
-final routerNotifierProvider = AutoDisposeAsyncNotifierProvider<RouterNotifier, void>.internal(
+final routerNotifierProvider =
+    AutoDisposeAsyncNotifierProvider<RouterNotifier, void>.internal(
   RouterNotifier.new,
   name: r'routerNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$routerNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$routerNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
