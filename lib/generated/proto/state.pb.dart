@@ -238,6 +238,8 @@ class Player extends $pb.GeneratedMessage {
         enumValues: PlayerStatus.values)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'slug')
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'order',
+        $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   Player._() : super();
@@ -245,6 +247,7 @@ class Player extends $pb.GeneratedMessage {
     PlayerStatus? status,
     $core.String? name,
     $core.String? slug,
+    $core.int? order,
   }) {
     final _result = create();
     if (status != null) {
@@ -255,6 +258,9 @@ class Player extends $pb.GeneratedMessage {
     }
     if (slug != null) {
       _result.slug = slug;
+    }
+    if (order != null) {
+      _result.order = order;
     }
     return _result;
   }
@@ -319,6 +325,18 @@ class Player extends $pb.GeneratedMessage {
   $core.bool hasSlug() => $_has(2);
   @$pb.TagNumber(3)
   void clearSlug() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get order => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set order($core.int v) {
+    $_setUnsignedInt32(3, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasOrder() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearOrder() => clearField(4);
 }
 
 class Settings extends $pb.GeneratedMessage {

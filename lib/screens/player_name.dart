@@ -1,9 +1,11 @@
-import "dart:async";
+import "dart:developer" as dev;
 
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../provider.dart";
+import "../router/router_notifier.dart";
 import "../util.dart";
 
 class PlayerNameScreen extends ConsumerStatefulWidget {
@@ -45,11 +47,19 @@ class _PlayerNameScreenState extends ConsumerState<PlayerNameScreen> {
                   if (!_formKey.currentState!.validate()) {
                     return;
                   }
-                  unawaited(ref.read(pNamePod.notifier).update(_controller.text));
-                  if (widget._next != null) {
-                    await navReplace(context, widget._next!);
+                  await ref.read(pNamePod.notifier).update(_controller.text);
+                  // ignore: use_build_context_synchronously
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  final prevRoute =
+                      ref.read(routerNotifierProvider.notifier).consumeRedirectedFrom();
+                  dev.log("player name prev route: $prevRoute");
+                  if (prevRoute != null) {
+                    context.go(prevRoute);
                   } else {
-                    navPop(context);
+                    context.pop();
                   }
                 },
               )

@@ -4,7 +4,7 @@ import "package:path_provider/path_provider.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:shared_preferences_riverpod/shared_preferences_riverpod.dart";
 
-import "game.dart";
+import "state/game_notifier.dart";
 
 late SharedPreferences pref;
 
@@ -21,7 +21,7 @@ final pNamePod = createPrefProvider<String>(
   defaultValue: "",
 );
 
-final gamePod = ChangeNotifierProvider((ref) => GameStateNotifier());
+final gameProvider = ChangeNotifierProvider((ref) => GameNotifier());
 
-final gameIsActivePod =
-    StateProvider((ref) => ref.watch(gamePod.select((value) => value.isActive)));
+final gameStageProvider =
+    Provider<GameStage>((ref) => ref.watch(gameProvider.select((value) => value.stage)));

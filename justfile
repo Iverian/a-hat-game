@@ -1,37 +1,43 @@
 # Use with https://github.com/casey/just
 
+dart_line_length := "100"
+
 # list commands
 default:
   @just --list
 
 # Format code
 fmt:
-  flutter format --line-length 100 --fix "{{ justfile_directory() }}/lib"
+  dart format --line-length "{{ dart_line_length }}" --fix "{{ justfile_directory() }}/lib"
 
 # Generate gRPC code
-grpc-gen:
+gen-grpc: && fmt
   #!/bin/sh
   set -eu
 
   base_dir=$(realpath "{{ justfile_directory() }}")
+  dart_line_length="{{ dart_line_length }}"
   in_dir="${base_dir}/proto"
   out_dir="${base_dir}/lib/generated"
 
   mkdir -p "${out_dir}"
   for i in $(find "${in_dir}" -name '*.proto' -type f) ; do
     p=$(realpath "--relative-to=${base_dir}" "${i}")
-    protoc "--dart_out=grpc:${out_dir}" "-I${base_dir}" "${p}"
+    (set -x ; protoc "--dart_out=grpc:${out_dir}" "-I${base_dir}" "${p}")
   done
 
-  dart format --line-length 100 --fix "${out_dir}"
-
-grpc-hello addr="localhost":
-  grpcurl -plaintext -proto protos/gamehost.proto -d '{"name": "hyu"}' {{ addr }}:12345 gamehost.Greeter/SayHello
-
-# Redirect Android Emulator port to host
-aemu-redir-add console_port="5554" host_port="9010" vm_port="9010":
+# Generate code
+gen-build: && fmt
   #!/bin/sh
   set -eu
+
+  base_dir=$(realpath "{{ justfile_directory() }}")
+  ( set -x ; flutter pub run build_runner build )
+
+# Redirect Android Emulator port to host
+aemu-redir-add console_port host_port="9010" vm_port="9010":
+  #!/bin/sh
+  set -eux
 
   token=$(realpath "$HOME/.emulator_console_auth_token")
   if [ ! -r "$token" ]; then
@@ -47,7 +53,7 @@ aemu-redir-add console_port="5554" host_port="9010" vm_port="9010":
   nc localhost "{{ console_port }}"
 
 # Remove Android Emulator redirection
-aemu-redir-del console_port="5554" host_port="9010":
+aemu-redir-del console_port host_port="9010":
   #!/bin/sh
   set -eu
 

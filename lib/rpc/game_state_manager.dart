@@ -3,8 +3,9 @@ import "dart:developer" as dev;
 import "dart:math";
 
 import "package:fixnum/fixnum.dart";
-import "package:tuple/tuple.dart";
 import "package:nanoid/nanoid.dart" as nanoid;
+import "package:tuple/tuple.dart";
+
 import "../generated/proto/state.pb.dart";
 import "error.dart";
 import "game_state_ext.dart";
@@ -14,9 +15,10 @@ const int kFirstRev = 1;
 const String kPlayerSlugAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 class GameStateManager {
-  GameState inner;
+  GameState inner = GameState(rev: 0);
+  int counter = 0;
 
-  GameStateManager() : inner = GameState(rev: 0);
+  GameStateManager();
 
   factory GameStateManager.fromClient({required GameState state}) =>
       GameStateManager()..inner = state;
@@ -52,22 +54,23 @@ class GameStateManager {
 
   Tuple2<int, GameStatePatch> updateLobbyJoin(String playerName) {
     final playerId = _generatePlayerIds(playerName);
-    return Tuple2(
-      playerId.id,
-      _applyServer(
-        _makePatch(confirm: false)
-          ..clearKind()
-          ..playerJoined = DoPlayerJoined(
-            playerId: playerId.id,
-            // TODO: handle connection status
-            player: Player(
-              status: PlayerStatus.JOINING,
-              name: playerName,
-              slug: playerId.slug,
-            ),
+    final playerOrder = counter;
+    final patch = _applyServer(
+      _makePatch(confirm: false)
+        ..clearKind()
+        ..playerJoined = DoPlayerJoined(
+          playerId: playerId.id,
+          // TODO: handle connection status
+          player: Player(
+            status: PlayerStatus.JOINING,
+            name: playerName,
+            slug: playerId.slug,
+            order: playerOrder,
           ),
-      ),
+        ),
     );
+    counter += 1;
+    return Tuple2(playerId.id, patch);
   }
 
   GameStatePatch updateLobbyLeave(int playerId) => _applyServer(
@@ -264,6 +267,9 @@ class GameStateManager {
       case GameStatePatch_Kind.playerLeft:
         _ensureLobbyStage();
         ensurePlayerPresent(patch.playerLeft.playerId);
+        if (patch.playerLeft.playerId == inner.hostId) {
+          throw InvalidUpdateError(message: "Host cannot leave");
+        }
 
         inner
           ..players.remove(patch.playerLeft.playerId)

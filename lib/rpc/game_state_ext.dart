@@ -1,3 +1,5 @@
+import "package:flutter/material.dart";
+
 import "../generated/proto/state.pb.dart";
 import "error.dart";
 
@@ -20,4 +22,27 @@ extension GameStateExt on GameState {
     final activeTeam = teams[turnIndex % teamsTotal];
     return (turnIndex >= teamsTotal) ? activeTeam.firstPlayerId : activeTeam.secondPlayerId;
   }
+
+  List<LobbyPlayer> lobbyPlayers() => players.entries
+      .map(
+        (e) => LobbyPlayer(
+          playerId: e.key,
+          data: e.value,
+          ready: lobby.state.containsKey(e.key),
+        ),
+      )
+      .toList();
+}
+
+@immutable
+class LobbyPlayer {
+  final int playerId;
+  final Player data;
+  final bool ready;
+
+  const LobbyPlayer({
+    required this.playerId,
+    required this.data,
+    required this.ready,
+  });
 }

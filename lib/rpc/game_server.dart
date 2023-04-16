@@ -12,39 +12,8 @@ import "error.dart";
 import "game_event_ext.dart";
 import "game_state_ext.dart";
 import "game_state_manager.dart";
+import "player_metadata.dart";
 import "util.dart";
-
-const kGrpcPlayerId = "x-player-id";
-const kGrpcRev = "x-revision";
-
-class PlayerMetadata {
-  final int playerId;
-  int rev;
-
-  PlayerMetadata({required this.playerId, required this.rev});
-
-  factory PlayerMetadata.fromId({required int playerId}) =>
-      PlayerMetadata(playerId: playerId, rev: 0);
-
-  factory PlayerMetadata.fromGrpc(Map<String, String>? clientMetadata) {
-    try {
-      final src = clientMetadata!;
-      return PlayerMetadata(
-        playerId: int.tryParse(src[kGrpcPlayerId]!)!,
-        rev: int.tryParse(src[kGrpcRev]!)!,
-      );
-    } on Exception catch (_) {
-      throw MissingMetadataError();
-    }
-  }
-
-  Map<String, String> toGrpc() {
-    final result = HashMap<String, String>();
-    result[kGrpcPlayerId] = playerId.toString();
-    result[kGrpcRev] = rev.toString();
-    return result;
-  }
-}
 
 class GameServer {
   final GameStateManager _state;
@@ -60,7 +29,7 @@ class GameServer {
           ),
         );
 
-  LocalGameClient getClient() => LocalGameClient(tx: _rx.sendPort);
+  GameServerClient getClient() => GameServerClient(tx: _rx.sendPort);
 
   Future<void> serve() async {
     var exit = false;
@@ -69,7 +38,7 @@ class GameServer {
       try {
         switch (req.kind) {
           case _RequestKind.confirm:
-            response = await _confirm(req.data as PlayerMetadata).then((value) => null);
+            response = await _confirm(req.data as _ConfirmData).then((value) => null);
             break;
           case _RequestKind.subscribe:
             response = await _subscribe(req.data as _SubscribeData).then((value) => null);
@@ -124,11 +93,11 @@ class GameServer {
     }
   }
 
-  Future<void> _confirm(PlayerMetadata data) async {
+  Future<void> _confirm(_ConfirmData data) async {
     if (data.rev != _state.rev) {
       throw InvalidStateRevisionError();
     }
-    await _listeners.setReady(data.playerId);
+    await _listeners.setReady(data.player.playerId);
   }
 
   Future<void> _subscribe(_SubscribeData data) async {
@@ -214,10 +183,10 @@ class GameServer {
   }
 }
 
-class LocalGameClient {
+class GameServerClient {
   final SendPort tx;
 
-  LocalGameClient({required this.tx});
+  GameServerClient({required this.tx});
 
   Stream<GameEvent> subscribe({required PlayerMetadata player}) async* {
     final result = ReceivePort();
@@ -240,10 +209,10 @@ class LocalGameClient {
     }
   }
 
-  Future<void> confirm({required PlayerMetadata player}) async {
+  Future<void> confirm({required PlayerMetadata player, required int rev}) async {
     await _request(
       kind: _RequestKind.confirm,
-      data: player,
+      data: _ConfirmData(player: player, rev: rev),
     );
   }
 
@@ -364,6 +333,13 @@ class _SubscribeData {
   final PlayerMetadata player;
 
   _SubscribeData({required this.tx, required this.player});
+}
+
+class _ConfirmData {
+  final PlayerMetadata player;
+  final int rev;
+
+  _ConfirmData({required this.player, required this.rev});
 }
 
 class _LobbyPlayerReadyData {

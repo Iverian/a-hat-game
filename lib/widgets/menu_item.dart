@@ -1,12 +1,12 @@
 import "package:flutter/material.dart";
 
-class MainMenuItem extends StatelessWidget {
+class MenuItem extends StatelessWidget {
   final String _title;
   final void Function()? _onTap;
 
-  const MainMenuItem({
-    super.key,
+  const MenuItem({
     required String title,
+    super.key,
     void Function()? onTap,
   })  : _title = title,
         _onTap = onTap;
@@ -20,7 +20,7 @@ class MainMenuItem extends StatelessWidget {
       fontWeight: FontWeight.normal,
     );
     return Card(
-      color: Theme.of(context).colorScheme.primary,
+      color: theme.colorScheme.primary,
       child: ListTile(
         title: Text(
           _title,

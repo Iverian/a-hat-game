@@ -133,6 +133,17 @@ const EventPatch$json = {
 /// Descriptor for `EventPatch`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List eventPatchDescriptor = $convert.base64Decode(
     'CgpFdmVudFBhdGNoEjQKBXBhdGNoGAEgASgLMh4uaGF0X2dhbWUuc3RhdGUuR2FtZVN0YXRlUGF0Y2hSBXBhdGNo');
+@$core.Deprecated('Use confirmRequestDescriptor instead')
+const ConfirmRequest$json = {
+  '1': 'ConfirmRequest',
+  '2': [
+    {'1': 'rev', '3': 1, '4': 1, '5': 13, '10': 'rev'},
+  ],
+};
+
+/// Descriptor for `ConfirmRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List confirmRequestDescriptor =
+    $convert.base64Decode('Cg5Db25maXJtUmVxdWVzdBIQCgNyZXYYASABKA1SA3Jldg==');
 @$core.Deprecated('Use fallibleResponseDescriptor instead')
 const FallibleResponse$json = {
   '1': 'FallibleResponse',

@@ -6,9 +6,10 @@ import "../generated/proto/error.pb.dart";
 import "../generated/proto/service.pbgrpc.dart";
 import "error.dart";
 import "game_server.dart";
+import "player_metadata.dart";
 
 class GrpcJoinService extends JoinServiceBase {
-  final LocalGameClient client;
+  final GameServerClient client;
   final String? code;
 
   GrpcJoinService({required this.client, required this.code});
@@ -32,7 +33,7 @@ class GrpcJoinService extends JoinServiceBase {
 }
 
 class GrpcGameService extends GameServiceBase {
-  final LocalGameClient client;
+  final GameServerClient client;
 
   GrpcGameService({required this.client});
 
@@ -44,10 +45,10 @@ class GrpcGameService extends GameServiceBase {
   @override
   Future<FallibleResponse> confirm(
     ServiceCall call,
-    Empty request,
+    ConfirmRequest request,
   ) =>
       _wrapRequest(call, (player) async {
-        await client.confirm(player: player);
+        await client.confirm(player: player, rev: request.rev);
       });
 
   @override

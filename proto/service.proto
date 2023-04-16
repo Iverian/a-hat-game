@@ -22,7 +22,7 @@ message LobbyJoinResponse {
 
 service Game {
   rpc Subscribe(hat_game.error.Empty) returns (stream GameEvent) {}
-  rpc Confirm(hat_game.error.Empty) returns (FallibleResponse) {}
+  rpc Confirm(ConfirmRequest) returns (FallibleResponse) {}
   rpc Heartbeat(hat_game.error.Empty) returns (FallibleResponse) {}
 
   rpc LobbyLeave(hat_game.error.Empty) returns (FallibleResponse) {}
@@ -51,6 +51,8 @@ message EventAck {}
 message EventRewind { hat_game.state.GameState state = 1; }
 
 message EventPatch { hat_game.state.GameStatePatch patch = 1; }
+
+message ConfirmRequest { uint32 rev = 1; }
 
 message FallibleResponse {
   oneof result {

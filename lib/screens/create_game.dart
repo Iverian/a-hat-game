@@ -7,7 +7,6 @@ import "../const.dart";
 import "../provider.dart";
 import "../rpc/settings_ext.dart";
 import "../util.dart";
-import "game.dart";
 
 class CreateGameScreen extends ConsumerStatefulWidget {
   const CreateGameScreen({super.key});
@@ -45,18 +44,17 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                       return;
                     }
 
-                    ref.read(gamePod).create(
+                    ref.read(gameProvider).create(
                           name: _controller.text,
                           playerName: ref.read(pNamePod),
                           // TODO: replace with settings
                           settings: SettingsExt.fromGameSettings(
-                            characterCount: 4,
+                            characterCount: 2,
                             turnDurationS: 60,
                           ),
                           // TODO: make configurable
                           isPrivate: false,
                         );
-                    await navReplace(context, (_) => GameScreen());
                   },
                 )
               ],

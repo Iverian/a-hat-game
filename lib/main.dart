@@ -1,10 +1,12 @@
 import "package:flutter/material.dart";
+import "package:flutter_hooks/flutter_hooks.dart";
 import "package:go_router/go_router.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 import "provider.dart";
-import "screens/home.dart";
+import "router/router_notifier.dart";
+import "router/routes.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,34 +18,29 @@ Future<void> main() async {
   );
 }
 
-class App extends StatelessWidget {
-  static const route = "/";
-
+class App extends HookConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
-        title: "Hat Game",
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lime),
-        ),
-        routerConfig: App.router(),
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.watch(routerNotifierProvider.notifier);
 
-  static GoRouter router() => GoRouter(
-        initialLocation: App.route,
-        routes: [
-          GoRoute(
-            path: "/",
-            builder: (context, state) => const HomePage(),
-          ),
-          // Маршрут для присоединения по ссылке
-          // TODO: добавить параметры присоединения: хост, порт, параметры аутентификации
-          // GoRoute(
-          //   path: JoinGamePage.route,
-          //   builder: (context, state) => JoinGamePage(config: GameConfig()),
-          // ),
-        ],
-      );
+    final key = useRef(GlobalKey<NavigatorState>(debugLabel: "routerKey"));
+    final router = useMemoized(
+      () => GoRouter(
+        navigatorKey: key.value,
+        refreshListenable: notifier,
+        debugLogDiagnostics: true,
+        initialLocation: const MainMenuRoute().location,
+        routes: notifier.routes,
+        redirect: notifier.redirect,
+      ),
+      [notifier],
+    );
+
+    return MaterialApp.router(
+      routerConfig: router,
+      theme: ThemeData.light(useMaterial3: true),
+    );
+  }
 }

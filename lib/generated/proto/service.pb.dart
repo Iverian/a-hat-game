@@ -537,6 +537,65 @@ class EventPatch extends $pb.GeneratedMessage {
   $2.GameStatePatch ensurePatch() => $_ensure(0);
 }
 
+class ConfirmRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ConfirmRequest',
+      package: const $pb.PackageName(
+          $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.service'),
+      createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rev',
+        $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false;
+
+  ConfirmRequest._() : super();
+  factory ConfirmRequest({
+    $core.int? rev,
+  }) {
+    final _result = create();
+    if (rev != null) {
+      _result.rev = rev;
+    }
+    return _result;
+  }
+  factory ConfirmRequest.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory ConfirmRequest.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  ConfirmRequest clone() => ConfirmRequest()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  ConfirmRequest copyWith(void Function(ConfirmRequest) updates) =>
+      super.copyWith((message) => updates(message as ConfirmRequest))
+          as ConfirmRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static ConfirmRequest create() => ConfirmRequest._();
+  ConfirmRequest createEmptyInstance() => create();
+  static $pb.PbList<ConfirmRequest> createRepeated() => $pb.PbList<ConfirmRequest>();
+  @$core.pragma('dart2js:noInline')
+  static ConfirmRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ConfirmRequest>(create);
+  static ConfirmRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get rev => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set rev($core.int v) {
+    $_setUnsignedInt32(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasRev() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearRev() => clearField(1);
+}
+
 enum FallibleResponse_Result { ok, err, notSet }
 
 class FallibleResponse extends $pb.GeneratedMessage {

@@ -1,23 +1,26 @@
 import "dart:async";
+import "dart:io";
 import "dart:isolate";
 
 import "package:async/async.dart";
 import "package:grpc/grpc.dart" as grpc;
-import "package:grpc/grpc_connection_interface.dart";
+import "package:grpc/grpc.dart";
 
+import "../generated/proto/service.pbgrpc.dart";
 import "../generated/proto/state.pb.dart";
+import "../state/game_client_state_notifier.dart";
+import "error.dart";
+import "game_client.dart";
 import "game_server.dart";
-import "game_state_listener.dart";
 import "game_state_manager.dart";
 import "grpc_server.dart";
-import "local_game_state_listener.dart";
 import "util.dart";
 
 class SpawnHostResult {
   final CloseHandle close;
-  final GameStateListener listener;
+  final GameClientStateNotifier notifier;
 
-  SpawnHostResult({required this.close, required this.listener});
+  SpawnHostResult({required this.close, required this.notifier});
 }
 
 class CloseHandle {
@@ -29,6 +32,39 @@ class CloseHandle {
   void close() {
     tx.send(true);
   }
+}
+
+// TODO: move all network calls to separate isolate
+Future<GameClientStateNotifier> spawnClient({
+  required String playerName,
+  required InternetAddress address,
+  required int port,
+  required String? code,
+}) async {
+  final channel = ClientChannel(
+    address.address,
+    port: port,
+    options: const ChannelOptions(
+      credentials: ChannelCredentials.insecure(),
+    ),
+  );
+
+  final resp = await JoinClient(channel).lobbyJoin(
+    LobbyJoinRequest(
+      playerName: playerName,
+      code: code,
+    ),
+  );
+  if (resp.hasErr()) {
+    throw RpcError.fromProtocolErr(resp.err);
+  }
+
+  return GameClientStateNotifier(
+    client: RemoteGameClient(
+      playerId: resp.ok,
+      channel: channel,
+    ),
+  );
 }
 
 Future<SpawnHostResult> spawnHost({
@@ -52,9 +88,11 @@ Future<SpawnHostResult> spawnHost({
   final _DoSpawnHostResponse response = await handleResponse(await rx.first);
   return SpawnHostResult(
     close: response.close,
-    listener: LocalGameStateListener(
-      playerId: response.hostPlayerId,
-      client: response.client,
+    notifier: GameClientStateNotifier(
+      client: LocalGameClient(
+        playerId: response.hostPlayerId,
+        client: response.client,
+      ),
     ),
   );
 }
@@ -76,7 +114,7 @@ class _DoSpawnHostRequest {
 }
 
 class _DoSpawnHostResponse {
-  final LocalGameClient client;
+  final GameServerClient client;
   final int hostPlayerId;
   final CloseHandle close;
 
@@ -114,7 +152,7 @@ Future<void> _doSpawnHost(_DoSpawnHostRequest request) async {
     ..add(grpcServer.serve(port: request.port))
     ..close();
   final _ = await rx.first;
-  await grpcServer.shutdown();
   await server.getClient().shutdown();
+  await grpcServer.shutdown();
   await group.future;
 }

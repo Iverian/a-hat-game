@@ -57,9 +57,9 @@ class GameClient extends $grpc.Client {
       '/hat_game.service.Game/Subscribe',
       ($1.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.GameEvent.fromBuffer(value));
-  static final _$confirm = $grpc.ClientMethod<$1.Empty, $0.FallibleResponse>(
+  static final _$confirm = $grpc.ClientMethod<$0.ConfirmRequest, $0.FallibleResponse>(
       '/hat_game.service.Game/Confirm',
-      ($1.Empty value) => value.writeToBuffer(),
+      ($0.ConfirmRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.FallibleResponse.fromBuffer(value));
   static final _$heartbeat = $grpc.ClientMethod<$1.Empty, $0.FallibleResponse>(
       '/hat_game.service.Game/Heartbeat',
@@ -100,7 +100,7 @@ class GameClient extends $grpc.Client {
         options: options);
   }
 
-  $grpc.ResponseFuture<$0.FallibleResponse> confirm($1.Empty request,
+  $grpc.ResponseFuture<$0.FallibleResponse> confirm($0.ConfirmRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$confirm, request, options: options);
   }
@@ -152,12 +152,12 @@ abstract class GameServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
         ($0.GameEvent value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$1.Empty, $0.FallibleResponse>(
+    $addMethod($grpc.ServiceMethod<$0.ConfirmRequest, $0.FallibleResponse>(
         'Confirm',
         confirm_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.ConfirmRequest.fromBuffer(value),
         ($0.FallibleResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$1.Empty, $0.FallibleResponse>(
         'Heartbeat',
@@ -216,7 +216,7 @@ abstract class GameServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.FallibleResponse> confirm_Pre(
-      $grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+      $grpc.ServiceCall call, $async.Future<$0.ConfirmRequest> request) async {
     return confirm(call, await request);
   }
 
@@ -256,7 +256,7 @@ abstract class GameServiceBase extends $grpc.Service {
   }
 
   $async.Stream<$0.GameEvent> subscribe($grpc.ServiceCall call, $1.Empty request);
-  $async.Future<$0.FallibleResponse> confirm($grpc.ServiceCall call, $1.Empty request);
+  $async.Future<$0.FallibleResponse> confirm($grpc.ServiceCall call, $0.ConfirmRequest request);
   $async.Future<$0.FallibleResponse> heartbeat($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.FallibleResponse> lobbyLeave($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.FallibleResponse> lobbyPlayerReady(
