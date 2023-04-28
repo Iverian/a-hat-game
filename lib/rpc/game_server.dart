@@ -15,6 +15,7 @@ import "game_state_manager.dart";
 import "player_metadata.dart";
 import "util.dart";
 
+// TODO: add lobby kick method
 class GameServer {
   final GameStateManager _state;
   final ReceivePort _rx;
@@ -32,68 +33,72 @@ class GameServer {
   GameServerClient getClient() => GameServerClient(tx: _rx.sendPort);
 
   Future<void> serve() async {
-    var exit = false;
     await for (final _Request req in _rx) {
-      dynamic response;
-      try {
-        switch (req.kind) {
-          case _RequestKind.confirm:
-            response = await _confirm(req.data as _ConfirmData).then((value) => null);
-            break;
-          case _RequestKind.subscribe:
-            response = await _subscribe(req.data as _SubscribeData).then((value) => null);
-            break;
-          case _RequestKind.lobbyJoin:
-            response = await _lobbyJoin(req.data as String);
-            break;
-          case _RequestKind.lobbyLeave:
-            response = await _lobbyLeave(req.data as PlayerMetadata).then((value) => null);
-            break;
-          case _RequestKind.lobbyPlayerReady:
-            response =
-                await _lobbyPlayerReady(req.data as _LobbyPlayerReadyData).then((value) => null);
-            break;
-          case _RequestKind.lobbyPlayerNotReady:
-            response = await _lobbyPlayerNotReady(req.data as PlayerMetadata).then((value) => null);
-            break;
-          case _RequestKind.lobbyPrepareStartGame:
-            response = await _lobbyPrepareStartGame().then((value) => null);
-            break;
-          case _RequestKind.lobbyStartGame:
-            response = await _lobbyStartGame().then((value) => null);
-            break;
-          case _RequestKind.startTurn:
-            response = await _startTurn(req.data as PlayerMetadata).then((value) => null);
-            break;
-          case _RequestKind.endTurn:
-            response = await _endTurn(req.data as _EndTurnData).then((value) => null);
-            break;
-          case _RequestKind.castVote:
-            response = await _castVote(req.data as _CastVoteData).then((value) => null);
-            break;
-          case _RequestKind.countVotes:
-            response = await _countVotes().then((value) => null);
-            break;
-          case _RequestKind.nextTurn:
-            response = await _nextTurn().then((value) => null);
-            break;
-          case _RequestKind.shutdown:
-            response = await _shutdown().then((value) => null);
-            exit = true;
-            break;
-        }
-      } on Exception catch (e) {
-        req.tx.send(e);
-        continue;
+      if (req.kind == _RequestKind.shutdown) {
+        req.tx.send(await _shutdown().then((value) => null));
+        return;
       }
-      req.tx.send(response);
-      if (exit) {
-        break;
-      }
+      // TODO: is there a better solution?
+      unawaited(_handle(req));
     }
   }
 
+  Future<void> _handle(_Request req) async {
+    dynamic response;
+    try {
+      switch (req.kind) {
+        case _RequestKind.confirm:
+          response = await _confirm(req.data as _ConfirmData).then((value) => null);
+          break;
+        case _RequestKind.subscribe:
+          response = await _subscribe(req.data as _SubscribeData).then((value) => null);
+          break;
+        case _RequestKind.lobbyJoin:
+          response = await _lobbyJoin(req.data as String);
+          break;
+        case _RequestKind.lobbyLeave:
+          response = await _lobbyLeave(req.data as PlayerMetadata).then((value) => null);
+          break;
+        case _RequestKind.lobbyPlayerReady:
+          response =
+              await _lobbyPlayerReady(req.data as _LobbyPlayerReadyData).then((value) => null);
+          break;
+        case _RequestKind.lobbyPlayerNotReady:
+          response = await _lobbyPlayerNotReady(req.data as PlayerMetadata).then((value) => null);
+          break;
+        case _RequestKind.gamePrepareStart:
+          response = await _gamePrepareStart().then((value) => null);
+          break;
+        case _RequestKind.gameStart:
+          response = await _gameStart().then((value) => null);
+          break;
+        case _RequestKind.startTurn:
+          response = await _startTurn(req.data as PlayerMetadata).then((value) => null);
+          break;
+        case _RequestKind.endTurn:
+          response = await _endTurn(req.data as _EndTurnData).then((value) => null);
+          break;
+        case _RequestKind.castVote:
+          response = await _castVote(req.data as _CastVoteData).then((value) => null);
+          break;
+        case _RequestKind.countVotes:
+          response = await _countVotes().then((value) => null);
+          break;
+        case _RequestKind.nextTurn:
+          response = await _nextTurn().then((value) => null);
+          break;
+        case _RequestKind.shutdown:
+          throw UnimplementedError();
+      }
+    } on Exception catch (e) {
+      req.tx.send(e);
+      return;
+    }
+    req.tx.send(response);
+  }
+
   Future<void> _confirm(_ConfirmData data) async {
+    dev.log("received confirmation request (clientRev = ${data.rev}, serverRev = ${_state.rev})");
     if (data.rev != _state.rev) {
       throw InvalidStateRevisionError();
     }
@@ -132,11 +137,11 @@ class GameServer {
     await _notifyAllPatch(_state.updateLobbyPlayerNotReady(data.playerId));
   }
 
-  Future<void> _lobbyPrepareStartGame() async {
+  Future<void> _gamePrepareStart() async {
     await _notifyAllPatch(_state.updateLobbyPrepareStartGame());
   }
 
-  Future<void> _lobbyStartGame() async {
+  Future<void> _gameStart() async {
     await _notifyAllPatch(_state.updateLobbyStartGame());
   }
 
@@ -243,11 +248,11 @@ class GameServerClient {
   }
 
   Future<void> lobbyPrepareStartGame() async {
-    await _request(kind: _RequestKind.lobbyPrepareStartGame);
+    await _request(kind: _RequestKind.gamePrepareStart);
   }
 
   Future<void> lobbyStartGame() async {
-    await _request(kind: _RequestKind.lobbyStartGame);
+    await _request(kind: _RequestKind.gameStart);
   }
 
   Future<void> startTurn({required PlayerMetadata player}) async {
@@ -310,8 +315,8 @@ enum _RequestKind {
   lobbyLeave,
   lobbyPlayerNotReady,
   lobbyPlayerReady,
-  lobbyPrepareStartGame,
-  lobbyStartGame,
+  gamePrepareStart,
+  gameStart,
   startTurn,
   endTurn,
   castVote,
@@ -399,10 +404,11 @@ class _Listeners {
           return List.empty();
         }
 
+        dev.log("waiting confirmation of patch ${patch.rev}");
         final rx = ReceivePort();
         await _barrier.activate(rx.sendPort, _data.keys);
         try {
-          await _waitWithTimeout(rx);
+          final _ = await rx.first;
           final notReady = await _barrier.deactivate();
           notReady.forEach(_removeRaw);
           _notifyAllRaw(GameEventExt.doAck());
@@ -415,16 +421,6 @@ class _Listeners {
   Future<void> notifyAll(GameEvent event) => _lock.protectRead(() async {
         _notifyAllRaw(event);
       });
-
-  Future<dynamic> _waitWithTimeout(ReceivePort rx) => rx.timeout(
-        _confirmTimeout,
-        onTimeout: (sink) {
-          dev.log("timed out waiting for confirmation");
-          sink
-            ..add(null)
-            ..close();
-        },
-      ).first;
 
   void _removeRaw(int listenerId) {
     final tx = _data.remove(listenerId);
@@ -454,6 +450,7 @@ class _BarrierLock {
         dev.log("barrier is not active");
         return;
       }
+      dev.log("received confirmation from $id");
       _data!.setReady(id);
     });
   }
@@ -490,8 +487,8 @@ class _Barrier {
       return;
     }
     data[id] = true;
-    if (data.values.reduce((value, element) => value && element)) {
-      tx.send(null);
+    if (data.values.fold(true, (previousValue, element) => previousValue && element)) {
+      tx.send(true);
     }
   }
 

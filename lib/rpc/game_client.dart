@@ -19,6 +19,9 @@ abstract class BaseGameClient {
   Future<void> lobbyLeave();
   Future<void> lobbyPlayerReady(List<Character> characters);
   Future<void> lobbyPlayerNotReady();
+  Future<void> gamePrepareStart();
+  Future<void> gameStart();
+  Future<void> nextTurn();
 }
 
 class LocalGameClient implements BaseGameClient {
@@ -52,6 +55,15 @@ class LocalGameClient implements BaseGameClient {
 
   @override
   Future<void> lobbyPlayerNotReady() => _client.lobbyPlayerNotReady(player: _player);
+
+  @override
+  Future<void> gameStart() => _client.lobbyStartGame();
+
+  @override
+  Future<void> gamePrepareStart() => _client.lobbyPrepareStartGame();
+
+  @override
+  Future<void> nextTurn() => _client.nextTurn();
 }
 
 class RemoteGameClient implements BaseGameClient {
@@ -86,4 +98,22 @@ class RemoteGameClient implements BaseGameClient {
 
   @override
   Future<void> lobbyPlayerNotReady() => _client.lobbyPlayerNotReady(Empty());
+
+  @override
+  Future<void> gameStart() async {
+    // Remote clients can't start game
+    // noop
+  }
+
+  @override
+  Future<void> gamePrepareStart() {
+    // Remote clients can't start game
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> nextTurn() {
+    // TODO: implement nextTurn
+    throw UnimplementedError();
+  }
 }

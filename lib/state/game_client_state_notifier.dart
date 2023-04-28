@@ -88,6 +88,7 @@ class GameClientStateNotifier {
             );
             final rev = _state.apply(event.patch.patch);
             if (event.needsConfirm()) {
+              dev.log("confirming patch $rev");
               await _client.confirm(rev: rev);
               final ack = await q.next;
               if (!ack.isAck()) {

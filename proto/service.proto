@@ -37,6 +37,7 @@ service Game {
 message GameEvent {
   oneof kind {
     FallibleResponse handshake = 1;
+    // TODO: add shutdown reason
     EventShutdown shutdown = 2;
     EventAck ack = 3;
     EventRewind rewind = 4;

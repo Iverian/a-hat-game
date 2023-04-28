@@ -16,14 +16,15 @@ import 'state.pbenum.dart';
 
 export 'state.pbenum.dart';
 
-enum GameState_Stage { lobby, preparing, round, finished, notSet }
+enum GameState_Stage { lobby, preparing, start, round, finished, notSet }
 
 class GameState extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, GameState_Stage> _GameState_StageByTag = {
     5: GameState_Stage.lobby,
     6: GameState_Stage.preparing,
-    7: GameState_Stage.round,
-    8: GameState_Stage.finished,
+    7: GameState_Stage.start,
+    8: GameState_Stage.round,
+    9: GameState_Stage.finished,
     0: GameState_Stage.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
@@ -31,7 +32,7 @@ class GameState extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
       createEmptyInstance: create)
-    ..oo(0, [5, 6, 7, 8])
+    ..oo(0, [5, 6, 7, 8, 9])
     ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rev',
         $pb.PbFieldType.OU3)
     ..m<$core.int, Player>(
@@ -51,10 +52,13 @@ class GameState extends $pb.GeneratedMessage {
     ..aOM<RunningGameState>(
         6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'preparing',
         subBuilder: RunningGameState.create)
-    ..aOM<Round>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'round',
+    ..aOM<RunningGameState>(
+        7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'start',
+        subBuilder: RunningGameState.create)
+    ..aOM<Round>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'round',
         subBuilder: Round.create)
     ..aOM<RunningGameState>(
-        8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'finished',
+        9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'finished',
         subBuilder: RunningGameState.create)
     ..hasRequiredFields = false;
 
@@ -66,6 +70,7 @@ class GameState extends $pb.GeneratedMessage {
     Settings? settings,
     Lobby? lobby,
     RunningGameState? preparing,
+    RunningGameState? start,
     Round? round,
     RunningGameState? finished,
   }) {
@@ -87,6 +92,9 @@ class GameState extends $pb.GeneratedMessage {
     }
     if (preparing != null) {
       _result.preparing = preparing;
+    }
+    if (start != null) {
+      _result.start = start;
     }
     if (round != null) {
       _result.round = round;
@@ -195,32 +203,46 @@ class GameState extends $pb.GeneratedMessage {
   RunningGameState ensurePreparing() => $_ensure(5);
 
   @$pb.TagNumber(7)
-  Round get round => $_getN(6);
+  RunningGameState get start => $_getN(6);
   @$pb.TagNumber(7)
-  set round(Round v) {
+  set start(RunningGameState v) {
     setField(7, v);
   }
 
   @$pb.TagNumber(7)
-  $core.bool hasRound() => $_has(6);
+  $core.bool hasStart() => $_has(6);
   @$pb.TagNumber(7)
-  void clearRound() => clearField(7);
+  void clearStart() => clearField(7);
   @$pb.TagNumber(7)
-  Round ensureRound() => $_ensure(6);
+  RunningGameState ensureStart() => $_ensure(6);
 
   @$pb.TagNumber(8)
-  RunningGameState get finished => $_getN(7);
+  Round get round => $_getN(7);
   @$pb.TagNumber(8)
-  set finished(RunningGameState v) {
+  set round(Round v) {
     setField(8, v);
   }
 
   @$pb.TagNumber(8)
-  $core.bool hasFinished() => $_has(7);
+  $core.bool hasRound() => $_has(7);
   @$pb.TagNumber(8)
-  void clearFinished() => clearField(8);
+  void clearRound() => clearField(8);
   @$pb.TagNumber(8)
-  RunningGameState ensureFinished() => $_ensure(7);
+  Round ensureRound() => $_ensure(7);
+
+  @$pb.TagNumber(9)
+  RunningGameState get finished => $_getN(8);
+  @$pb.TagNumber(9)
+  set finished(RunningGameState v) {
+    setField(9, v);
+  }
+
+  @$pb.TagNumber(9)
+  $core.bool hasFinished() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearFinished() => clearField(9);
+  @$pb.TagNumber(9)
+  RunningGameState ensureFinished() => $_ensure(8);
 }
 
 class Player extends $pb.GeneratedMessage {
@@ -351,18 +373,22 @@ class Settings extends $pb.GeneratedMessage {
         $pb.PbFieldType.OU3)
     ..a<$core.int>(
         2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnDurationS',
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'minimalPlayers',
         $pb.PbFieldType.OU3)
     ..a<$core.int>(
         3,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'voteTimeoutS',
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnDurationS',
         $pb.PbFieldType.OU3)
     ..a<$core.int>(
         4,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'startTimeoutS',
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'voteTimeoutS',
         $pb.PbFieldType.OU3)
     ..a<$core.int>(
         5,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'startTimeoutS',
+        $pb.PbFieldType.OU3)
+    ..a<$core.int>(
+        6,
         const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'confirmTimeoutS',
         $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
@@ -370,6 +396,7 @@ class Settings extends $pb.GeneratedMessage {
   Settings._() : super();
   factory Settings({
     $core.int? characterCount,
+    $core.int? minimalPlayers,
     $core.int? turnDurationS,
     $core.int? voteTimeoutS,
     $core.int? startTimeoutS,
@@ -378,6 +405,9 @@ class Settings extends $pb.GeneratedMessage {
     final _result = create();
     if (characterCount != null) {
       _result.characterCount = characterCount;
+    }
+    if (minimalPlayers != null) {
+      _result.minimalPlayers = minimalPlayers;
     }
     if (turnDurationS != null) {
       _result.turnDurationS = turnDurationS;
@@ -432,52 +462,64 @@ class Settings extends $pb.GeneratedMessage {
   void clearCharacterCount() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.int get turnDurationS => $_getIZ(1);
+  $core.int get minimalPlayers => $_getIZ(1);
   @$pb.TagNumber(2)
-  set turnDurationS($core.int v) {
+  set minimalPlayers($core.int v) {
     $_setUnsignedInt32(1, v);
   }
 
   @$pb.TagNumber(2)
-  $core.bool hasTurnDurationS() => $_has(1);
+  $core.bool hasMinimalPlayers() => $_has(1);
   @$pb.TagNumber(2)
-  void clearTurnDurationS() => clearField(2);
+  void clearMinimalPlayers() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.int get voteTimeoutS => $_getIZ(2);
+  $core.int get turnDurationS => $_getIZ(2);
   @$pb.TagNumber(3)
-  set voteTimeoutS($core.int v) {
+  set turnDurationS($core.int v) {
     $_setUnsignedInt32(2, v);
   }
 
   @$pb.TagNumber(3)
-  $core.bool hasVoteTimeoutS() => $_has(2);
+  $core.bool hasTurnDurationS() => $_has(2);
   @$pb.TagNumber(3)
-  void clearVoteTimeoutS() => clearField(3);
+  void clearTurnDurationS() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.int get startTimeoutS => $_getIZ(3);
+  $core.int get voteTimeoutS => $_getIZ(3);
   @$pb.TagNumber(4)
-  set startTimeoutS($core.int v) {
+  set voteTimeoutS($core.int v) {
     $_setUnsignedInt32(3, v);
   }
 
   @$pb.TagNumber(4)
-  $core.bool hasStartTimeoutS() => $_has(3);
+  $core.bool hasVoteTimeoutS() => $_has(3);
   @$pb.TagNumber(4)
-  void clearStartTimeoutS() => clearField(4);
+  void clearVoteTimeoutS() => clearField(4);
 
   @$pb.TagNumber(5)
-  $core.int get confirmTimeoutS => $_getIZ(4);
+  $core.int get startTimeoutS => $_getIZ(4);
   @$pb.TagNumber(5)
-  set confirmTimeoutS($core.int v) {
+  set startTimeoutS($core.int v) {
     $_setUnsignedInt32(4, v);
   }
 
   @$pb.TagNumber(5)
-  $core.bool hasConfirmTimeoutS() => $_has(4);
+  $core.bool hasStartTimeoutS() => $_has(4);
   @$pb.TagNumber(5)
-  void clearConfirmTimeoutS() => clearField(5);
+  void clearStartTimeoutS() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.int get confirmTimeoutS => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set confirmTimeoutS($core.int v) {
+    $_setUnsignedInt32(5, v);
+  }
+
+  @$pb.TagNumber(6)
+  $core.bool hasConfirmTimeoutS() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearConfirmTimeoutS() => clearField(6);
 }
 
 class Character extends $pb.GeneratedMessage {
@@ -1841,6 +1883,7 @@ enum GameStatePatch_Kind {
   playerDisconnected,
   playerConnected,
   prepareStart,
+  start,
   pause,
   roundNext,
   turnNext,
@@ -1861,14 +1904,15 @@ class GameStatePatch extends $pb.GeneratedMessage {
     14: GameStatePatch_Kind.playerDisconnected,
     15: GameStatePatch_Kind.playerConnected,
     16: GameStatePatch_Kind.prepareStart,
-    17: GameStatePatch_Kind.pause,
-    18: GameStatePatch_Kind.roundNext,
-    19: GameStatePatch_Kind.turnNext,
-    20: GameStatePatch_Kind.turnStart,
-    21: GameStatePatch_Kind.turnEnd,
-    22: GameStatePatch_Kind.votePlayer,
-    23: GameStatePatch_Kind.voteCount,
-    24: GameStatePatch_Kind.gameFinished,
+    17: GameStatePatch_Kind.start,
+    18: GameStatePatch_Kind.pause,
+    19: GameStatePatch_Kind.roundNext,
+    20: GameStatePatch_Kind.turnNext,
+    21: GameStatePatch_Kind.turnStart,
+    22: GameStatePatch_Kind.turnEnd,
+    23: GameStatePatch_Kind.votePlayer,
+    24: GameStatePatch_Kind.voteCount,
+    25: GameStatePatch_Kind.gameFinished,
     0: GameStatePatch_Kind.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
@@ -1876,7 +1920,7 @@ class GameStatePatch extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
       createEmptyInstance: create)
-    ..oo(0, [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24])
+    ..oo(0, [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25])
     ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rev',
         $pb.PbFieldType.OU3)
     ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'confirm')
@@ -1901,28 +1945,31 @@ class GameStatePatch extends $pb.GeneratedMessage {
     ..aOM<DoPrepareStart>(
         16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'prepareStart',
         subBuilder: DoPrepareStart.create)
-    ..aOM<DoPause>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pause',
+    ..aOM<DoStartGame>(
+        17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'start',
+        subBuilder: DoStartGame.create)
+    ..aOM<DoPause>(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pause',
         subBuilder: DoPause.create)
     ..aOM<DoNextRound>(
-        18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'roundNext',
+        19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'roundNext',
         subBuilder: DoNextRound.create)
     ..aOM<DoNextTurn>(
-        19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnNext',
+        20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnNext',
         subBuilder: DoNextTurn.create)
     ..aOM<DoStartTurn>(
-        20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnStart',
+        21, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnStart',
         subBuilder: DoStartTurn.create)
     ..aOM<DoEndTurn>(
-        21, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnEnd',
+        22, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'turnEnd',
         subBuilder: DoEndTurn.create)
     ..aOM<DoPlayerVoted>(
-        22, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'votePlayer',
+        23, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'votePlayer',
         subBuilder: DoPlayerVoted.create)
     ..aOM<DoVoteCount>(
-        23, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'voteCount',
+        24, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'voteCount',
         subBuilder: DoVoteCount.create)
     ..aOM<DoGameFinished>(
-        24, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'gameFinished',
+        25, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'gameFinished',
         subBuilder: DoGameFinished.create)
     ..hasRequiredFields = false;
 
@@ -1937,6 +1984,7 @@ class GameStatePatch extends $pb.GeneratedMessage {
     DoPlayerDisconnected? playerDisconnected,
     DoPlayerConnected? playerConnected,
     DoPrepareStart? prepareStart,
+    DoStartGame? start,
     DoPause? pause,
     DoNextRound? roundNext,
     DoNextTurn? turnNext,
@@ -1973,6 +2021,9 @@ class GameStatePatch extends $pb.GeneratedMessage {
     }
     if (prepareStart != null) {
       _result.prepareStart = prepareStart;
+    }
+    if (start != null) {
+      _result.start = start;
     }
     if (pause != null) {
       _result.pause = pause;
@@ -2152,116 +2203,130 @@ class GameStatePatch extends $pb.GeneratedMessage {
   DoPrepareStart ensurePrepareStart() => $_ensure(8);
 
   @$pb.TagNumber(17)
-  DoPause get pause => $_getN(9);
+  DoStartGame get start => $_getN(9);
   @$pb.TagNumber(17)
-  set pause(DoPause v) {
+  set start(DoStartGame v) {
     setField(17, v);
   }
 
   @$pb.TagNumber(17)
-  $core.bool hasPause() => $_has(9);
+  $core.bool hasStart() => $_has(9);
   @$pb.TagNumber(17)
-  void clearPause() => clearField(17);
+  void clearStart() => clearField(17);
   @$pb.TagNumber(17)
-  DoPause ensurePause() => $_ensure(9);
+  DoStartGame ensureStart() => $_ensure(9);
 
   @$pb.TagNumber(18)
-  DoNextRound get roundNext => $_getN(10);
+  DoPause get pause => $_getN(10);
   @$pb.TagNumber(18)
-  set roundNext(DoNextRound v) {
+  set pause(DoPause v) {
     setField(18, v);
   }
 
   @$pb.TagNumber(18)
-  $core.bool hasRoundNext() => $_has(10);
+  $core.bool hasPause() => $_has(10);
   @$pb.TagNumber(18)
-  void clearRoundNext() => clearField(18);
+  void clearPause() => clearField(18);
   @$pb.TagNumber(18)
-  DoNextRound ensureRoundNext() => $_ensure(10);
+  DoPause ensurePause() => $_ensure(10);
 
   @$pb.TagNumber(19)
-  DoNextTurn get turnNext => $_getN(11);
+  DoNextRound get roundNext => $_getN(11);
   @$pb.TagNumber(19)
-  set turnNext(DoNextTurn v) {
+  set roundNext(DoNextRound v) {
     setField(19, v);
   }
 
   @$pb.TagNumber(19)
-  $core.bool hasTurnNext() => $_has(11);
+  $core.bool hasRoundNext() => $_has(11);
   @$pb.TagNumber(19)
-  void clearTurnNext() => clearField(19);
+  void clearRoundNext() => clearField(19);
   @$pb.TagNumber(19)
-  DoNextTurn ensureTurnNext() => $_ensure(11);
+  DoNextRound ensureRoundNext() => $_ensure(11);
 
   @$pb.TagNumber(20)
-  DoStartTurn get turnStart => $_getN(12);
+  DoNextTurn get turnNext => $_getN(12);
   @$pb.TagNumber(20)
-  set turnStart(DoStartTurn v) {
+  set turnNext(DoNextTurn v) {
     setField(20, v);
   }
 
   @$pb.TagNumber(20)
-  $core.bool hasTurnStart() => $_has(12);
+  $core.bool hasTurnNext() => $_has(12);
   @$pb.TagNumber(20)
-  void clearTurnStart() => clearField(20);
+  void clearTurnNext() => clearField(20);
   @$pb.TagNumber(20)
-  DoStartTurn ensureTurnStart() => $_ensure(12);
+  DoNextTurn ensureTurnNext() => $_ensure(12);
 
   @$pb.TagNumber(21)
-  DoEndTurn get turnEnd => $_getN(13);
+  DoStartTurn get turnStart => $_getN(13);
   @$pb.TagNumber(21)
-  set turnEnd(DoEndTurn v) {
+  set turnStart(DoStartTurn v) {
     setField(21, v);
   }
 
   @$pb.TagNumber(21)
-  $core.bool hasTurnEnd() => $_has(13);
+  $core.bool hasTurnStart() => $_has(13);
   @$pb.TagNumber(21)
-  void clearTurnEnd() => clearField(21);
+  void clearTurnStart() => clearField(21);
   @$pb.TagNumber(21)
-  DoEndTurn ensureTurnEnd() => $_ensure(13);
+  DoStartTurn ensureTurnStart() => $_ensure(13);
 
   @$pb.TagNumber(22)
-  DoPlayerVoted get votePlayer => $_getN(14);
+  DoEndTurn get turnEnd => $_getN(14);
   @$pb.TagNumber(22)
-  set votePlayer(DoPlayerVoted v) {
+  set turnEnd(DoEndTurn v) {
     setField(22, v);
   }
 
   @$pb.TagNumber(22)
-  $core.bool hasVotePlayer() => $_has(14);
+  $core.bool hasTurnEnd() => $_has(14);
   @$pb.TagNumber(22)
-  void clearVotePlayer() => clearField(22);
+  void clearTurnEnd() => clearField(22);
   @$pb.TagNumber(22)
-  DoPlayerVoted ensureVotePlayer() => $_ensure(14);
+  DoEndTurn ensureTurnEnd() => $_ensure(14);
 
   @$pb.TagNumber(23)
-  DoVoteCount get voteCount => $_getN(15);
+  DoPlayerVoted get votePlayer => $_getN(15);
   @$pb.TagNumber(23)
-  set voteCount(DoVoteCount v) {
+  set votePlayer(DoPlayerVoted v) {
     setField(23, v);
   }
 
   @$pb.TagNumber(23)
-  $core.bool hasVoteCount() => $_has(15);
+  $core.bool hasVotePlayer() => $_has(15);
   @$pb.TagNumber(23)
-  void clearVoteCount() => clearField(23);
+  void clearVotePlayer() => clearField(23);
   @$pb.TagNumber(23)
-  DoVoteCount ensureVoteCount() => $_ensure(15);
+  DoPlayerVoted ensureVotePlayer() => $_ensure(15);
 
   @$pb.TagNumber(24)
-  DoGameFinished get gameFinished => $_getN(16);
+  DoVoteCount get voteCount => $_getN(16);
   @$pb.TagNumber(24)
-  set gameFinished(DoGameFinished v) {
+  set voteCount(DoVoteCount v) {
     setField(24, v);
   }
 
   @$pb.TagNumber(24)
-  $core.bool hasGameFinished() => $_has(16);
+  $core.bool hasVoteCount() => $_has(16);
   @$pb.TagNumber(24)
-  void clearGameFinished() => clearField(24);
+  void clearVoteCount() => clearField(24);
   @$pb.TagNumber(24)
-  DoGameFinished ensureGameFinished() => $_ensure(16);
+  DoVoteCount ensureVoteCount() => $_ensure(16);
+
+  @$pb.TagNumber(25)
+  DoGameFinished get gameFinished => $_getN(17);
+  @$pb.TagNumber(25)
+  set gameFinished(DoGameFinished v) {
+    setField(25, v);
+  }
+
+  @$pb.TagNumber(25)
+  $core.bool hasGameFinished() => $_has(17);
+  @$pb.TagNumber(25)
+  void clearGameFinished() => clearField(25);
+  @$pb.TagNumber(25)
+  DoGameFinished ensureGameFinished() => $_ensure(17);
 }
 
 enum DoHandshake_Result { ok, err, notSet }
@@ -2971,6 +3036,43 @@ class DoPause extends $pb.GeneratedMessage {
   $core.bool hasState() => $_has(0);
   @$pb.TagNumber(1)
   void clearState() => clearField(1);
+}
+
+class DoStartGame extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DoStartGame',
+      package: const $pb.PackageName(
+          $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hat_game.state'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  DoStartGame._() : super();
+  factory DoStartGame() => create();
+  factory DoStartGame.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DoStartGame.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  DoStartGame clone() => DoStartGame()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DoStartGame copyWith(void Function(DoStartGame) updates) =>
+      super.copyWith((message) => updates(message as DoStartGame))
+          as DoStartGame; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static DoStartGame create() => DoStartGame._();
+  DoStartGame createEmptyInstance() => create();
+  static $pb.PbList<DoStartGame> createRepeated() => $pb.PbList<DoStartGame>();
+  @$core.pragma('dart2js:noInline')
+  static DoStartGame getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DoStartGame>(create);
+  static DoStartGame? _defaultInstance;
 }
 
 class DoNextRound extends $pb.GeneratedMessage {

@@ -12,8 +12,9 @@ message GameState {
   oneof stage {
     Lobby lobby = 5;
     RunningGameState preparing = 6;
-    Round round = 7;
-    RunningGameState finished = 8;
+    RunningGameState start = 7;
+    Round round = 8;
+    RunningGameState finished = 9;
   }
 }
 
@@ -32,10 +33,11 @@ enum PlayerStatus {
 
 message Settings {
   uint32 character_count = 1;
-  uint32 turn_duration_s = 2;
-  uint32 vote_timeout_s = 3;
-  uint32 start_timeout_s = 4;
-  uint32 confirm_timeout_s = 5;
+  uint32 minimal_players = 2;
+  uint32 turn_duration_s = 3;
+  uint32 vote_timeout_s = 4;
+  uint32 start_timeout_s = 5;
+  uint32 confirm_timeout_s = 6;
 }
 
 message Character {
@@ -129,14 +131,15 @@ message GameStatePatch {
     DoPlayerDisconnected player_disconnected = 14;
     DoPlayerConnected player_connected = 15;
     DoPrepareStart prepare_start = 16;
-    DoPause pause = 17;
-    DoNextRound round_next = 18;
-    DoNextTurn turn_next = 19;
-    DoStartTurn turn_start = 20;
-    DoEndTurn turn_end = 21;
-    DoPlayerVoted vote_player = 22;
-    DoVoteCount vote_count = 23;
-    DoGameFinished game_finished = 24;
+    DoStartGame start = 17;
+    DoPause pause = 18;
+    DoNextRound round_next = 19;
+    DoNextTurn turn_next = 20;
+    DoStartTurn turn_start = 21;
+    DoEndTurn turn_end = 22;
+    DoPlayerVoted vote_player = 23;
+    DoVoteCount vote_count = 24;
+    DoGameFinished game_finished = 25;
   };
 }
 
@@ -172,6 +175,8 @@ message DoPlayerConnected { fixed32 player_id = 1; }
 message DoPrepareStart { TeamList teams = 1; }
 
 message DoPause { bool state = 1; }
+
+message DoStartGame {}
 
 message DoNextRound { uint32 round_index = 1; }
 

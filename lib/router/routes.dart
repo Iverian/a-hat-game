@@ -2,10 +2,14 @@ import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 
 import "../screens/create_game.dart";
+import "../screens/game_menu.dart";
+import "../screens/game_start.dart";
 import "../screens/join_game.dart";
 import "../screens/lobby.dart";
+import "../screens/lobby_menu.dart";
 import "../screens/main_menu.dart";
 import "../screens/player_name.dart";
+import "../screens/prepare_game.dart";
 import "../screens/splash.dart";
 
 part "routes.g.dart";
@@ -67,14 +71,60 @@ class JoinGameRoute extends GoRouteData {
   Widget build(BuildContext context, GoRouterState state) => const JoinGameScreen();
 }
 
-@TypedGoRoute<LobbyRoute>(
-  path: LobbyRoute.path,
+@TypedGoRoute<LobbyMenuRoute>(
+  path: LobbyMenuRoute.path,
+  routes: [
+    TypedGoRoute<LobbyRoute>(path: LobbyRoute.path),
+  ],
 )
-class LobbyRoute extends GoRouteData {
+class LobbyMenuRoute extends GoRouteData {
   static const path = "/lobby";
+
+  const LobbyMenuRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const LobbyMenuScreen();
+}
+
+class LobbyRoute extends GoRouteData {
+  static const path = "main";
 
   const LobbyRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) => const LobbyScreen();
+}
+
+@TypedGoRoute<PrepareGameRoute>(path: PrepareGameRoute.path)
+class PrepareGameRoute extends GoRouteData {
+  static const path = "/prepare";
+
+  const PrepareGameRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const PrepareGameScreen();
+}
+
+@TypedGoRoute<GameMenuRoute>(
+  path: GameMenuRoute.path,
+  routes: [
+    TypedGoRoute<GameStartRoute>(path: GameStartRoute.path),
+  ],
+)
+class GameMenuRoute extends GoRouteData {
+  static const path = "/game";
+
+  const GameMenuRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const GameMenuScreen();
+}
+
+class GameStartRoute extends GoRouteData {
+  static const path = "start";
+
+  const GameStartRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const GameStartScreen();
 }

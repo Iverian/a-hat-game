@@ -20,14 +20,12 @@ mixin _$RouterState {
   GameStage get gameStage => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
-  $RouterStateCopyWith<RouterState> get copyWith =>
-      throw _privateConstructorUsedError;
+  $RouterStateCopyWith<RouterState> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $RouterStateCopyWith<$Res> {
-  factory $RouterStateCopyWith(
-          RouterState value, $Res Function(RouterState) then) =
+  factory $RouterStateCopyWith(RouterState value, $Res Function(RouterState) then) =
       _$RouterStateCopyWithImpl<$Res, RouterState>;
   @useResult
   $Res call({bool isPlayerNameSet, GameStage gameStage});
@@ -63,10 +61,8 @@ class _$RouterStateCopyWithImpl<$Res, $Val extends RouterState>
 }
 
 /// @nodoc
-abstract class _$$_RouterStateCopyWith<$Res>
-    implements $RouterStateCopyWith<$Res> {
-  factory _$$_RouterStateCopyWith(
-          _$_RouterState value, $Res Function(_$_RouterState) then) =
+abstract class _$$_RouterStateCopyWith<$Res> implements $RouterStateCopyWith<$Res> {
+  factory _$$_RouterStateCopyWith(_$_RouterState value, $Res Function(_$_RouterState) then) =
       __$$_RouterStateCopyWithImpl<$Res>;
   @override
   @useResult
@@ -74,11 +70,9 @@ abstract class _$$_RouterStateCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_RouterStateCopyWithImpl<$Res>
-    extends _$RouterStateCopyWithImpl<$Res, _$_RouterState>
+class __$$_RouterStateCopyWithImpl<$Res> extends _$RouterStateCopyWithImpl<$Res, _$_RouterState>
     implements _$$_RouterStateCopyWith<$Res> {
-  __$$_RouterStateCopyWithImpl(
-      _$_RouterState _value, $Res Function(_$_RouterState) _then)
+  __$$_RouterStateCopyWithImpl(_$_RouterState _value, $Res Function(_$_RouterState) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -103,8 +97,7 @@ class __$$_RouterStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_RouterState implements _RouterState {
-  const _$_RouterState(
-      {required this.isPlayerNameSet, required this.gameStage});
+  const _$_RouterState({required this.isPlayerNameSet, required this.gameStage});
 
   @override
   final bool isPlayerNameSet;
@@ -123,8 +116,7 @@ class _$_RouterState implements _RouterState {
             other is _$_RouterState &&
             (identical(other.isPlayerNameSet, isPlayerNameSet) ||
                 other.isPlayerNameSet == isPlayerNameSet) &&
-            (identical(other.gameStage, gameStage) ||
-                other.gameStage == gameStage));
+            (identical(other.gameStage, gameStage) || other.gameStage == gameStage));
   }
 
   @override
@@ -139,8 +131,7 @@ class _$_RouterState implements _RouterState {
 
 abstract class _RouterState implements RouterState {
   const factory _RouterState(
-      {required final bool isPlayerNameSet,
-      required final GameStage gameStage}) = _$_RouterState;
+      {required final bool isPlayerNameSet, required final GameStage gameStage}) = _$_RouterState;
 
   @override
   bool get isPlayerNameSet;
@@ -148,6 +139,5 @@ abstract class _RouterState implements RouterState {
   GameStage get gameStage;
   @override
   @JsonKey(ignore: true)
-  _$$_RouterStateCopyWith<_$_RouterState> get copyWith =>
-      throw _privateConstructorUsedError;
+  _$$_RouterStateCopyWith<_$_RouterState> get copyWith => throw _privateConstructorUsedError;
 }

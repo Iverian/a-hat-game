@@ -50,6 +50,7 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                           // TODO: replace with settings
                           settings: SettingsExt.fromGameSettings(
                             characterCount: 2,
+                            minimalPlayers: 2,
                             turnDurationS: 60,
                           ),
                           // TODO: make configurable

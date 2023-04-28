@@ -71,10 +71,19 @@ const GameState$json = {
       '9': 0,
       '10': 'preparing'
     },
-    {'1': 'round', '3': 7, '4': 1, '5': 11, '6': '.hat_game.state.Round', '9': 0, '10': 'round'},
+    {
+      '1': 'start',
+      '3': 7,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.state.RunningGameState',
+      '9': 0,
+      '10': 'start'
+    },
+    {'1': 'round', '3': 8, '4': 1, '5': 11, '6': '.hat_game.state.Round', '9': 0, '10': 'round'},
     {
       '1': 'finished',
-      '3': 8,
+      '3': 9,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.RunningGameState',
@@ -100,7 +109,7 @@ const GameState_PlayersEntry$json = {
 
 /// Descriptor for `GameState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
-    'CglHYW1lU3RhdGUSEAoDcmV2GAEgASgNUgNyZXYSQAoHcGxheWVycxgCIAMoCzImLmhhdF9nYW1lLnN0YXRlLkdhbWVTdGF0ZS5QbGF5ZXJzRW50cnlSB3BsYXllcnMSFwoHaG9zdF9pZBgDIAEoB1IGaG9zdElkEjQKCHNldHRpbmdzGAQgASgLMhguaGF0X2dhbWUuc3RhdGUuU2V0dGluZ3NSCHNldHRpbmdzEi0KBWxvYmJ5GAUgASgLMhUuaGF0X2dhbWUuc3RhdGUuTG9iYnlIAFIFbG9iYnkSQAoJcHJlcGFyaW5nGAYgASgLMiAuaGF0X2dhbWUuc3RhdGUuUnVubmluZ0dhbWVTdGF0ZUgAUglwcmVwYXJpbmcSLQoFcm91bmQYByABKAsyFS5oYXRfZ2FtZS5zdGF0ZS5Sb3VuZEgAUgVyb3VuZBI+CghmaW5pc2hlZBgIIAEoCzIgLmhhdF9nYW1lLnN0YXRlLlJ1bm5pbmdHYW1lU3RhdGVIAFIIZmluaXNoZWQaUgoMUGxheWVyc0VudHJ5EhAKA2tleRgBIAEoB1IDa2V5EiwKBXZhbHVlGAIgASgLMhYuaGF0X2dhbWUuc3RhdGUuUGxheWVyUgV2YWx1ZToCOAFCBwoFc3RhZ2U=');
+    'CglHYW1lU3RhdGUSEAoDcmV2GAEgASgNUgNyZXYSQAoHcGxheWVycxgCIAMoCzImLmhhdF9nYW1lLnN0YXRlLkdhbWVTdGF0ZS5QbGF5ZXJzRW50cnlSB3BsYXllcnMSFwoHaG9zdF9pZBgDIAEoB1IGaG9zdElkEjQKCHNldHRpbmdzGAQgASgLMhguaGF0X2dhbWUuc3RhdGUuU2V0dGluZ3NSCHNldHRpbmdzEi0KBWxvYmJ5GAUgASgLMhUuaGF0X2dhbWUuc3RhdGUuTG9iYnlIAFIFbG9iYnkSQAoJcHJlcGFyaW5nGAYgASgLMiAuaGF0X2dhbWUuc3RhdGUuUnVubmluZ0dhbWVTdGF0ZUgAUglwcmVwYXJpbmcSOAoFc3RhcnQYByABKAsyIC5oYXRfZ2FtZS5zdGF0ZS5SdW5uaW5nR2FtZVN0YXRlSABSBXN0YXJ0Ei0KBXJvdW5kGAggASgLMhUuaGF0X2dhbWUuc3RhdGUuUm91bmRIAFIFcm91bmQSPgoIZmluaXNoZWQYCSABKAsyIC5oYXRfZ2FtZS5zdGF0ZS5SdW5uaW5nR2FtZVN0YXRlSABSCGZpbmlzaGVkGlIKDFBsYXllcnNFbnRyeRIQCgNrZXkYASABKAdSA2tleRIsCgV2YWx1ZRgCIAEoCzIWLmhhdF9nYW1lLnN0YXRlLlBsYXllclIFdmFsdWU6AjgBQgcKBXN0YWdl');
 @$core.Deprecated('Use playerDescriptor instead')
 const Player$json = {
   '1': 'Player',
@@ -120,16 +129,17 @@ const Settings$json = {
   '1': 'Settings',
   '2': [
     {'1': 'character_count', '3': 1, '4': 1, '5': 13, '10': 'characterCount'},
-    {'1': 'turn_duration_s', '3': 2, '4': 1, '5': 13, '10': 'turnDurationS'},
-    {'1': 'vote_timeout_s', '3': 3, '4': 1, '5': 13, '10': 'voteTimeoutS'},
-    {'1': 'start_timeout_s', '3': 4, '4': 1, '5': 13, '10': 'startTimeoutS'},
-    {'1': 'confirm_timeout_s', '3': 5, '4': 1, '5': 13, '10': 'confirmTimeoutS'},
+    {'1': 'minimal_players', '3': 2, '4': 1, '5': 13, '10': 'minimalPlayers'},
+    {'1': 'turn_duration_s', '3': 3, '4': 1, '5': 13, '10': 'turnDurationS'},
+    {'1': 'vote_timeout_s', '3': 4, '4': 1, '5': 13, '10': 'voteTimeoutS'},
+    {'1': 'start_timeout_s', '3': 5, '4': 1, '5': 13, '10': 'startTimeoutS'},
+    {'1': 'confirm_timeout_s', '3': 6, '4': 1, '5': 13, '10': 'confirmTimeoutS'},
   ],
 };
 
 /// Descriptor for `Settings`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List settingsDescriptor = $convert.base64Decode(
-    'CghTZXR0aW5ncxInCg9jaGFyYWN0ZXJfY291bnQYASABKA1SDmNoYXJhY3RlckNvdW50EiYKD3R1cm5fZHVyYXRpb25fcxgCIAEoDVINdHVybkR1cmF0aW9uUxIkCg52b3RlX3RpbWVvdXRfcxgDIAEoDVIMdm90ZVRpbWVvdXRTEiYKD3N0YXJ0X3RpbWVvdXRfcxgEIAEoDVINc3RhcnRUaW1lb3V0UxIqChFjb25maXJtX3RpbWVvdXRfcxgFIAEoDVIPY29uZmlybVRpbWVvdXRT');
+    'CghTZXR0aW5ncxInCg9jaGFyYWN0ZXJfY291bnQYASABKA1SDmNoYXJhY3RlckNvdW50EicKD21pbmltYWxfcGxheWVycxgCIAEoDVIObWluaW1hbFBsYXllcnMSJgoPdHVybl9kdXJhdGlvbl9zGAMgASgNUg10dXJuRHVyYXRpb25TEiQKDnZvdGVfdGltZW91dF9zGAQgASgNUgx2b3RlVGltZW91dFMSJgoPc3RhcnRfdGltZW91dF9zGAUgASgNUg1zdGFydFRpbWVvdXRTEioKEWNvbmZpcm1fdGltZW91dF9zGAYgASgNUg9jb25maXJtVGltZW91dFM=');
 @$core.Deprecated('Use characterDescriptor instead')
 const Character$json = {
   '1': 'Character',
@@ -539,10 +549,19 @@ const GameStatePatch$json = {
       '9': 0,
       '10': 'prepareStart'
     },
-    {'1': 'pause', '3': 17, '4': 1, '5': 11, '6': '.hat_game.state.DoPause', '9': 0, '10': 'pause'},
+    {
+      '1': 'start',
+      '3': 17,
+      '4': 1,
+      '5': 11,
+      '6': '.hat_game.state.DoStartGame',
+      '9': 0,
+      '10': 'start'
+    },
+    {'1': 'pause', '3': 18, '4': 1, '5': 11, '6': '.hat_game.state.DoPause', '9': 0, '10': 'pause'},
     {
       '1': 'round_next',
-      '3': 18,
+      '3': 19,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoNextRound',
@@ -551,7 +570,7 @@ const GameStatePatch$json = {
     },
     {
       '1': 'turn_next',
-      '3': 19,
+      '3': 20,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoNextTurn',
@@ -560,7 +579,7 @@ const GameStatePatch$json = {
     },
     {
       '1': 'turn_start',
-      '3': 20,
+      '3': 21,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoStartTurn',
@@ -569,7 +588,7 @@ const GameStatePatch$json = {
     },
     {
       '1': 'turn_end',
-      '3': 21,
+      '3': 22,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoEndTurn',
@@ -578,7 +597,7 @@ const GameStatePatch$json = {
     },
     {
       '1': 'vote_player',
-      '3': 22,
+      '3': 23,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoPlayerVoted',
@@ -587,7 +606,7 @@ const GameStatePatch$json = {
     },
     {
       '1': 'vote_count',
-      '3': 23,
+      '3': 24,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoVoteCount',
@@ -596,7 +615,7 @@ const GameStatePatch$json = {
     },
     {
       '1': 'game_finished',
-      '3': 24,
+      '3': 25,
       '4': 1,
       '5': 11,
       '6': '.hat_game.state.DoGameFinished',
@@ -611,7 +630,7 @@ const GameStatePatch$json = {
 
 /// Descriptor for `GameStatePatch`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List gameStatePatchDescriptor = $convert.base64Decode(
-    'Cg5HYW1lU3RhdGVQYXRjaBIQCgNyZXYYASABKA1SA3JldhIYCgdjb25maXJtGAIgASgIUgdjb25maXJtEkUKDXBsYXllcl9qb2luZWQYCiABKAsyHi5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllckpvaW5lZEgAUgxwbGF5ZXJKb2luZWQSPwoLcGxheWVyX2xlZnQYCyABKAsyHC5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllckxlZnRIAFIKcGxheWVyTGVmdBJCCgxwbGF5ZXJfcmVhZHkYDCABKAsyHS5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllclJlYWR5SABSC3BsYXllclJlYWR5EkwKEHBsYXllcl9ub3RfcmVhZHkYDSABKAsyIC5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllck5vdFJlYWR5SABSDnBsYXllck5vdFJlYWR5ElcKE3BsYXllcl9kaXNjb25uZWN0ZWQYDiABKAsyJC5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllckRpc2Nvbm5lY3RlZEgAUhJwbGF5ZXJEaXNjb25uZWN0ZWQSTgoQcGxheWVyX2Nvbm5lY3RlZBgPIAEoCzIhLmhhdF9nYW1lLnN0YXRlLkRvUGxheWVyQ29ubmVjdGVkSABSD3BsYXllckNvbm5lY3RlZBJFCg1wcmVwYXJlX3N0YXJ0GBAgASgLMh4uaGF0X2dhbWUuc3RhdGUuRG9QcmVwYXJlU3RhcnRIAFIMcHJlcGFyZVN0YXJ0Ei8KBXBhdXNlGBEgASgLMhcuaGF0X2dhbWUuc3RhdGUuRG9QYXVzZUgAUgVwYXVzZRI8Cgpyb3VuZF9uZXh0GBIgASgLMhsuaGF0X2dhbWUuc3RhdGUuRG9OZXh0Um91bmRIAFIJcm91bmROZXh0EjkKCXR1cm5fbmV4dBgTIAEoCzIaLmhhdF9nYW1lLnN0YXRlLkRvTmV4dFR1cm5IAFIIdHVybk5leHQSPAoKdHVybl9zdGFydBgUIAEoCzIbLmhhdF9nYW1lLnN0YXRlLkRvU3RhcnRUdXJuSABSCXR1cm5TdGFydBI2Cgh0dXJuX2VuZBgVIAEoCzIZLmhhdF9nYW1lLnN0YXRlLkRvRW5kVHVybkgAUgd0dXJuRW5kEkAKC3ZvdGVfcGxheWVyGBYgASgLMh0uaGF0X2dhbWUuc3RhdGUuRG9QbGF5ZXJWb3RlZEgAUgp2b3RlUGxheWVyEjwKCnZvdGVfY291bnQYFyABKAsyGy5oYXRfZ2FtZS5zdGF0ZS5Eb1ZvdGVDb3VudEgAUgl2b3RlQ291bnQSRQoNZ2FtZV9maW5pc2hlZBgYIAEoCzIeLmhhdF9nYW1lLnN0YXRlLkRvR2FtZUZpbmlzaGVkSABSDGdhbWVGaW5pc2hlZEIGCgRraW5k');
+    'Cg5HYW1lU3RhdGVQYXRjaBIQCgNyZXYYASABKA1SA3JldhIYCgdjb25maXJtGAIgASgIUgdjb25maXJtEkUKDXBsYXllcl9qb2luZWQYCiABKAsyHi5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllckpvaW5lZEgAUgxwbGF5ZXJKb2luZWQSPwoLcGxheWVyX2xlZnQYCyABKAsyHC5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllckxlZnRIAFIKcGxheWVyTGVmdBJCCgxwbGF5ZXJfcmVhZHkYDCABKAsyHS5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllclJlYWR5SABSC3BsYXllclJlYWR5EkwKEHBsYXllcl9ub3RfcmVhZHkYDSABKAsyIC5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllck5vdFJlYWR5SABSDnBsYXllck5vdFJlYWR5ElcKE3BsYXllcl9kaXNjb25uZWN0ZWQYDiABKAsyJC5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllckRpc2Nvbm5lY3RlZEgAUhJwbGF5ZXJEaXNjb25uZWN0ZWQSTgoQcGxheWVyX2Nvbm5lY3RlZBgPIAEoCzIhLmhhdF9nYW1lLnN0YXRlLkRvUGxheWVyQ29ubmVjdGVkSABSD3BsYXllckNvbm5lY3RlZBJFCg1wcmVwYXJlX3N0YXJ0GBAgASgLMh4uaGF0X2dhbWUuc3RhdGUuRG9QcmVwYXJlU3RhcnRIAFIMcHJlcGFyZVN0YXJ0EjMKBXN0YXJ0GBEgASgLMhsuaGF0X2dhbWUuc3RhdGUuRG9TdGFydEdhbWVIAFIFc3RhcnQSLwoFcGF1c2UYEiABKAsyFy5oYXRfZ2FtZS5zdGF0ZS5Eb1BhdXNlSABSBXBhdXNlEjwKCnJvdW5kX25leHQYEyABKAsyGy5oYXRfZ2FtZS5zdGF0ZS5Eb05leHRSb3VuZEgAUglyb3VuZE5leHQSOQoJdHVybl9uZXh0GBQgASgLMhouaGF0X2dhbWUuc3RhdGUuRG9OZXh0VHVybkgAUgh0dXJuTmV4dBI8Cgp0dXJuX3N0YXJ0GBUgASgLMhsuaGF0X2dhbWUuc3RhdGUuRG9TdGFydFR1cm5IAFIJdHVyblN0YXJ0EjYKCHR1cm5fZW5kGBYgASgLMhkuaGF0X2dhbWUuc3RhdGUuRG9FbmRUdXJuSABSB3R1cm5FbmQSQAoLdm90ZV9wbGF5ZXIYFyABKAsyHS5oYXRfZ2FtZS5zdGF0ZS5Eb1BsYXllclZvdGVkSABSCnZvdGVQbGF5ZXISPAoKdm90ZV9jb3VudBgYIAEoCzIbLmhhdF9nYW1lLnN0YXRlLkRvVm90ZUNvdW50SABSCXZvdGVDb3VudBJFCg1nYW1lX2ZpbmlzaGVkGBkgASgLMh4uaGF0X2dhbWUuc3RhdGUuRG9HYW1lRmluaXNoZWRIAFIMZ2FtZUZpbmlzaGVkQgYKBGtpbmQ=');
 @$core.Deprecated('Use doHandshakeDescriptor instead')
 const DoHandshake$json = {
   '1': 'DoHandshake',
@@ -750,6 +769,13 @@ const DoPause$json = {
 /// Descriptor for `DoPause`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List doPauseDescriptor =
     $convert.base64Decode('CgdEb1BhdXNlEhQKBXN0YXRlGAEgASgIUgVzdGF0ZQ==');
+@$core.Deprecated('Use doStartGameDescriptor instead')
+const DoStartGame$json = {
+  '1': 'DoStartGame',
+};
+
+/// Descriptor for `DoStartGame`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List doStartGameDescriptor = $convert.base64Decode('CgtEb1N0YXJ0R2FtZQ==');
 @$core.Deprecated('Use doNextRoundDescriptor instead')
 const DoNextRound$json = {
   '1': 'DoNextRound',

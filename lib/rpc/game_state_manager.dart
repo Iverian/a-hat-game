@@ -92,7 +92,7 @@ class GameStateManager {
       );
 
   GameStatePatch updateLobbyPrepareStartGame() {
-    _ensureGameStart();
+    _ensureLobbyGameCanBeStarted();
 
     final rng = Random.secure();
     final players = inner.players.keys.toList()..shuffle(rng);
@@ -122,7 +122,7 @@ class GameStateManager {
   GameStatePatch updateLobbyStartGame() => _applyServer(
         _makePatch(confirm: false)
           ..clearKind()
-          ..roundNext = DoNextRound(roundIndex: 0),
+          ..start = DoStartGame(),
       );
 
   List<GameStatePatch> tryUpdatePlayerConnected(int playerId) {
@@ -214,14 +214,28 @@ class GameStateManager {
 
   GameStatePatch updateNextTurn() {
     late GameStatePatch patch;
-    if (inner.round.characterPool.characters.isEmpty) {
-      patch = _makePatch(confirm: true)
-        ..clearKind()
-        ..roundNext = DoNextRound(roundIndex: inner.round.roundIndex + 1);
-    } else {
-      patch = _makePatch(confirm: false)
-        ..clearKind()
-        ..turnNext = DoNextTurn(turnIndex: inner.round.turnIndex + 1);
+    switch (inner.whichStage()) {
+      case GameState_Stage.start:
+        patch = _makePatch(confirm: false)
+          ..clearKind()
+          ..roundNext = DoNextRound(roundIndex: 0);
+        break;
+      case GameState_Stage.round:
+        if (inner.round.characterPool.characters.isEmpty) {
+          patch = _makePatch(confirm: true)
+            ..clearKind()
+            ..roundNext = DoNextRound(roundIndex: inner.round.roundIndex + 1);
+        } else {
+          patch = _makePatch(confirm: false)
+            ..clearKind()
+            ..turnNext = DoNextTurn(turnIndex: inner.round.turnIndex + 1);
+        }
+        break;
+      case GameState_Stage.preparing:
+      case GameState_Stage.finished:
+      case GameState_Stage.lobby:
+      case GameState_Stage.notSet:
+        throw UnimplementedError();
     }
     return _applyServer(patch);
   }
@@ -301,6 +315,14 @@ class GameStateManager {
             patch.prepareStart.teams,
           );
         break;
+      case GameStatePatch_Kind.start:
+        _ensurePreparingStage();
+
+        final state = inner.preparing;
+        inner
+          ..clearStage()
+          ..start = state;
+        break;
       case GameStatePatch_Kind.roundNext:
         _ensureNotPaused();
 
@@ -314,8 +336,8 @@ class GameStateManager {
 
         late RunningGameState innerState;
         if (value.roundIndex == 0) {
-          _ensurePreparingStage();
-          innerState = inner.preparing;
+          _ensureStartStage();
+          innerState = inner.start;
         } else {
           _ensureTurnVoteCountStage();
           innerState = inner.round.state;
@@ -446,7 +468,7 @@ class GameStateManager {
     return result;
   }
 
-  void _ensureGameStart() {
+  void _ensureLobbyGameCanBeStarted() {
     for (final i in inner.players.entries) {
       if (i.value.status != PlayerStatus.CONNECTED || !inner.lobby.state.containsKey(i.key)) {
         throw StartGameError();
@@ -463,6 +485,12 @@ class GameStateManager {
   void _ensurePreparingStage() {
     if (inner.whichStage() != GameState_Stage.preparing) {
       throw InvalidUpdateError(message: "game is not in preparing stage");
+    }
+  }
+
+  void _ensureStartStage() {
+    if (inner.whichStage() != GameState_Stage.start) {
+      throw InvalidUpdateError(message: "game is not in start stage");
     }
   }
 

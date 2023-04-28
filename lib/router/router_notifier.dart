@@ -6,7 +6,6 @@ import "package:go_router/go_router.dart";
 import "package:riverpod_annotation/riverpod_annotation.dart";
 
 import "../provider.dart";
-import "../screens/lobby.dart";
 import "../state/game_notifier.dart";
 import "routes.dart";
 
@@ -35,7 +34,20 @@ class RouterNotifier extends _$RouterNotifier implements Listenable {
   ];
 
   static List<String> kLobbyRoutes = [
+    const LobbyMenuRoute().location,
     const LobbyRoute().location,
+  ];
+
+  static List<String> kPrepareRoutes = [
+    const PrepareGameRoute().location,
+  ];
+
+  static List<String> kStartRoutes = [
+    const GameStartRoute().location,
+  ];
+
+  static List<String> kRoundRoutes = [
+    const GameMenuRoute().location,
   ];
 
   @override
@@ -65,6 +77,7 @@ class RouterNotifier extends _$RouterNotifier implements Listenable {
   }
 
   String? redirect(BuildContext context, GoRouterState state) {
+    // FIXME: replace with onboarding screen that starts on first launch
     dev.log("redirect for (state: $_inner, location: ${state.location})");
     if (!_inner.isPlayerNameSet && kPlayerNameRedirectFrom.contains(state.location)) {
       return _redirectImpl(const PlayerNameRoute().location, state.location);
@@ -82,13 +95,25 @@ class RouterNotifier extends _$RouterNotifier implements Listenable {
         }
         break;
       case GameStage.lobby:
-      case GameStage.preparing:
         if (!kLobbyRoutes.contains(state.location)) {
           return _redirectImpl(const LobbyRoute().location, state.location);
         }
         break;
+      case GameStage.preparing:
+        if (!kPrepareRoutes.contains(state.location)) {
+          return _redirectImpl(const PrepareGameRoute().location, state.location);
+        }
+        break;
+      case GameStage.start:
+        if (!kStartRoutes.contains(state.location)) {
+          return _redirectImpl(const GameStartRoute().location, state.location);
+        }
+        break;
+      // TODO: redirect to correct route
       case GameStage.round:
-        // TODO: Handle this case.
+        if (!kRoundRoutes.contains(state.location)) {
+          return _redirectImpl(const GameMenuRoute().location, state.location);
+        }
         break;
       case GameStage.finished:
         // TODO: Handle this case.

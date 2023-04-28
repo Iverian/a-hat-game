@@ -18,6 +18,7 @@ enum GameStage {
   loading,
   lobby,
   preparing,
+  start,
   round,
   finished,
 }
@@ -38,6 +39,8 @@ class GameNotifier extends ChangeNotifier {
         return GameStage.lobby;
       case GameState_Stage.preparing:
         return GameStage.preparing;
+      case GameState_Stage.start:
+        return GameStage.start;
       case GameState_Stage.round:
         return GameStage.round;
       case GameState_Stage.finished:

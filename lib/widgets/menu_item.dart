@@ -1,15 +1,18 @@
 import "package:flutter/material.dart";
 
 class MenuItem extends StatelessWidget {
-  final String _title;
-  final void Function()? _onTap;
+  final String title;
+  final void Function()? onTap;
+  final void Function()? onLongPress;
+  final bool enabled;
 
   const MenuItem({
-    required String title,
+    required this.title,
+    this.onTap,
+    this.onLongPress,
+    bool? enabled,
     super.key,
-    void Function()? onTap,
-  })  : _title = title,
-        _onTap = onTap;
+  }) : enabled = enabled ?? true;
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +26,13 @@ class MenuItem extends StatelessWidget {
       color: theme.colorScheme.primary,
       child: ListTile(
         title: Text(
-          _title,
+          title,
           style: style,
+          textAlign: TextAlign.center,
         ),
-        onTap: _onTap,
+        enabled: enabled,
+        onTap: onTap,
+        onLongPress: onLongPress,
       ),
     );
   }

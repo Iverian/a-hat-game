@@ -2,6 +2,7 @@ const kNetworkServiceType = "_hatgame._tcp";
 const kServerPortDefault = 9010;
 const kLobbyCodeLength = 6;
 const kNetworkServiceNameLength = 15;
+const kForcedMinimalPlayers = 2;
 const kRoomNames = [
   "БЕЗУМНЫЙ ДЕНЬ В ОБЩЕЖИТИИ",
   "ВО СНЕ И НАЯВУ",

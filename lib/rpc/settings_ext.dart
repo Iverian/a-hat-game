@@ -7,10 +7,12 @@ const kConfirmTimeoutS = 5;
 extension SettingsExt on Settings {
   static Settings fromGameSettings({
     required int characterCount,
+    required int minimalPlayers,
     required int turnDurationS,
   }) =>
       Settings(
         characterCount: characterCount,
+        minimalPlayers: minimalPlayers,
         turnDurationS: turnDurationS,
         voteTimeoutS: kVoteTimeoutS,
         startTimeoutS: kStartTimeoutS,
