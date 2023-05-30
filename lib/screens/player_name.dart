@@ -9,9 +9,7 @@ import "../router/router_notifier.dart";
 import "../util.dart";
 
 class PlayerNameScreen extends ConsumerStatefulWidget {
-  final Widget Function(BuildContext)? _next;
-
-  const PlayerNameScreen({super.key, Widget Function(BuildContext)? next}) : _next = next;
+  const PlayerNameScreen({super.key});
 
   @override
   ConsumerState<PlayerNameScreen> createState() => _PlayerNameScreenState();
@@ -53,8 +51,9 @@ class _PlayerNameScreenState extends ConsumerState<PlayerNameScreen> {
                     return;
                   }
 
-                  final prevRoute =
-                      ref.read(routerNotifierProvider.notifier).consumeRedirectedFrom();
+                  final prevRoute = ref
+                      .read(routerNotifierProvider.notifier)
+                      .consumeRedirectedFrom();
                   dev.log("player name prev route: $prevRoute");
                   if (prevRoute != null) {
                     context.go(prevRoute);

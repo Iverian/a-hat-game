@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
@@ -17,7 +18,8 @@ class GameStartScreen extends HookConsumerWidget {
     }
 
     final meIsHost = ref.watch(meIsHostProvider);
-    final teams = ref.watch(gameProvider.select((value) => value.state.getTeamsView()));
+    final teams =
+        ref.watch(gameProvider.select((value) => value.state.getTeamsView()));
     return Scaffold(
       body: Column(
         children: [
@@ -46,7 +48,7 @@ class GameStartScreen extends HookConsumerWidget {
 class _TeamCard extends StatelessWidget {
   final TeamView value;
 
-  _TeamCard({required this.value, super.key});
+  const _TeamCard({required this.value});
 
   @override
   Widget build(BuildContext context) => Card(
@@ -67,4 +69,10 @@ class _TeamCard extends StatelessWidget {
           ],
         ),
       );
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<TeamView>("value", value));
+  }
 }

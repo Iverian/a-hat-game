@@ -1,5 +1,6 @@
 import "dart:math";
 
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:tuple/tuple.dart";
@@ -7,7 +8,6 @@ import "package:tuple/tuple.dart";
 import "../const.dart";
 import "../generated/proto/state.pb.dart";
 import "../provider.dart";
-import "../rpc/game_client.dart";
 import "../rpc/game_state_ext.dart";
 import "../state/game_notifier.dart";
 import "../widgets/edit_character.dart";
@@ -16,9 +16,11 @@ import "splash.dart";
 
 const kCountdownDummy = -1;
 
-final _characterListProvider = StateProvider.autoDispose<List<Character>>((ref) => []);
+final _characterListProvider =
+    StateProvider.autoDispose<List<Character>>((ref) => []);
 final _autoStartFlagProvider = StateProvider.autoDispose<bool>((ref) => false);
-final _gameStartTriggeredFlagProvider = StateProvider.autoDispose<bool>((ref) => false);
+final _gameStartTriggeredFlagProvider =
+    StateProvider.autoDispose<bool>((ref) => false);
 final _playersProvider = Provider(
   (ref) => ref.watch(
     gameProvider.select((value) => value.state.getLobbyPlayersView()),
@@ -32,10 +34,12 @@ final _autoStartConditionProvider = Provider.autoDispose(
           final players = value.state.getLobbyPlayersView();
           final minimalPlayers = value.state.settings.minimalPlayers;
           final playersCount = players.length;
-          final playersIsReady =
-              players.fold(true, (previousValue, element) => previousValue && element.ready);
+          final playersIsReady = players.fold(
+              true, (previousValue, element) => previousValue && element.ready,);
 
-          return playersCount.isEven && playersCount >= minimalPlayers && playersIsReady;
+          return playersCount.isEven &&
+              playersCount >= minimalPlayers &&
+              playersIsReady;
         },
       ),
     );
@@ -84,22 +88,23 @@ class LobbyScreen extends HookConsumerWidget {
 }
 
 class _LobbyJoinTab extends HookConsumerWidget {
-  const _LobbyJoinTab({super.key});
+  const _LobbyJoinTab();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-        body: const Center(
+  Widget build(BuildContext context, WidgetRef ref) => const Scaffold(
+        body: Center(
           child: Text("1"),
         ),
       );
 }
 
 class _LobbyPlayersTab extends HookConsumerWidget {
-  const _LobbyPlayersTab({super.key});
+  const _LobbyPlayersTab();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myPlayerId = ref.watch(gameProvider.select((value) => value.playerId));
+    final myPlayerId =
+        ref.watch(gameProvider.select((value) => value.playerId));
     final players = ref.watch(_playersProvider)
       ..sort((a, b) => a.data.order.compareTo(b.data.order));
     final meIsHost = ref.watch(meIsHostProvider);
@@ -135,7 +140,8 @@ class _LobbyStartButton extends StatefulHookConsumerWidget {
   const _LobbyStartButton();
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LobbyStartButtonState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _LobbyStartButtonState();
 }
 
 class _LobbyStartButtonState extends ConsumerState<_LobbyStartButton> {
@@ -148,14 +154,18 @@ class _LobbyStartButtonState extends ConsumerState<_LobbyStartButton> {
         (value) =>
             value.length.isEven &&
             value.length >= kForcedMinimalPlayers &&
-            value.fold(true, (previousValue, element) => previousValue && element.ready),
+            value.fold(true,
+                (previousValue, element) => previousValue && element.ready,),
       ),
     );
     final readyPlayers = ref.watch(
       gameProvider.select((value) {
         final players = value.state.getLobbyPlayersView();
         return Tuple2(
-          players.fold(0, (previousValue, element) => previousValue += element.ready ? 1 : 0),
+          players.fold(
+              0,
+              (previousValue, element) =>
+                  previousValue += element.ready ? 1 : 0,),
           min(players.length, value.state.settings.minimalPlayers),
         );
       }),
@@ -185,7 +195,8 @@ class _LobbyStartButtonState extends ConsumerState<_LobbyStartButton> {
         onLongPress: canGameStart
             ? () async {
                 setState(() {
-                  ref.read(_gameStartTriggeredFlagProvider.notifier).state = true;
+                  ref.read(_gameStartTriggeredFlagProvider.notifier).state =
+                      true;
                 });
                 await ref.read(gameProvider).client.gamePrepareStart();
               }
@@ -217,19 +228,20 @@ class _LobbyStartButtonState extends ConsumerState<_LobbyStartButton> {
 }
 
 class _LobbyCharacterTab extends StatefulHookConsumerWidget {
-  const _LobbyCharacterTab({super.key});
+  const _LobbyCharacterTab();
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LobbyCharacterTabState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _LobbyCharacterTabState();
 }
 
 class _LobbyCharacterTabState extends ConsumerState<_LobbyCharacterTab> {
   @override
   Widget build(BuildContext context) {
-    final characterCount =
-        ref.watch(gameProvider.select((value) => value.state.settings.characterCount));
-    final isMeReady = ref
-        .watch(gameProvider.select((value) => value.state.lobby.state.containsKey(value.playerId)));
+    final characterCount = ref.watch(
+        gameProvider.select((value) => value.state.settings.characterCount),);
+    final isMeReady = ref.watch(gameProvider.select(
+        (value) => value.state.lobby.state.containsKey(value.playerId),),);
     final characters = ref.watch(_characterListProvider);
 
     final isDone = characterCount == characters.length;
@@ -248,14 +260,18 @@ class _LobbyCharacterTabState extends ConsumerState<_LobbyCharacterTab> {
                     initialValue: e.value,
                     onSubmit: (result) {
                       setState(() {
-                        ref.read(_characterListProvider.notifier).state[e.key] = result;
+                        ref.read(_characterListProvider.notifier).state[e.key] =
+                            result;
                       });
                     },
                   );
                 },
                 onDelete: () {
                   setState(() {
-                    ref.read(_characterListProvider.notifier).state.removeAt(e.key);
+                    ref
+                        .read(_characterListProvider.notifier)
+                        .state
+                        .removeAt(e.key);
                   });
                 },
               ),
@@ -287,26 +303,36 @@ class _LobbyCharacterTabState extends ConsumerState<_LobbyCharacterTab> {
   }
 }
 
+@immutable
 class _CharacterCard extends StatelessWidget {
   final Character value;
-  void Function() onEdit;
-  void Function() onDelete;
-  bool enabled;
+  final void Function() onEdit;
+  final void Function() onDelete;
+  final bool enabled;
 
-  _CharacterCard({
+  const _CharacterCard({
     required this.value,
     required this.onEdit,
     required this.onDelete,
     required this.enabled,
-    super.key,
   });
 
   @override
   Widget build(BuildContext context) => ListTile(
         title: Text(value.title),
-        subtitle: Text(value.description.isNotEmpty ? value.description : "(пусто)"),
+        subtitle:
+            Text(value.description.isNotEmpty ? value.description : "(пусто)"),
         enabled: enabled,
         onTap: onEdit,
         onLongPress: onDelete,
       );
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<Character>("value", value))
+      ..add(ObjectFlagProperty<void Function()>.has("onEdit", onEdit))
+      ..add(ObjectFlagProperty<void Function()>.has("onDelete", onDelete))
+      ..add(DiagnosticsProperty<bool>("enabled", enabled));
+  }
 }

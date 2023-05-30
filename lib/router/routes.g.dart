@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'routes.dart';
+part of "routes.dart";
 
 // **************************************************************************
 // GoRouterGenerator
@@ -15,7 +15,7 @@ List<RouteBase> get $appRoutes => [
     ];
 
 RouteBase get $splashRoute => GoRouteData.$route(
-      path: '/splash',
+      path: "/splash",
       factory: $SplashRouteExtension._fromState,
     );
 
@@ -23,7 +23,7 @@ extension $SplashRouteExtension on SplashRoute {
   static SplashRoute _fromState(GoRouterState state) => const SplashRoute();
 
   String get location => GoRouteData.$location(
-        '/splash',
+        "/splash",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -34,19 +34,19 @@ extension $SplashRouteExtension on SplashRoute {
 }
 
 RouteBase get $mainMenuRoute => GoRouteData.$route(
-      path: '/home',
+      path: "/home",
       factory: $MainMenuRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: 'playerName',
+          path: "playerName",
           factory: $PlayerNameRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: 'create',
+          path: "create",
           factory: $CreateGameRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: 'join',
+          path: "join",
           factory: $JoinGameRouteExtension._fromState,
         ),
       ],
@@ -56,7 +56,7 @@ extension $MainMenuRouteExtension on MainMenuRoute {
   static MainMenuRoute _fromState(GoRouterState state) => const MainMenuRoute();
 
   String get location => GoRouteData.$location(
-        '/home',
+        "/home",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -70,7 +70,7 @@ extension $PlayerNameRouteExtension on PlayerNameRoute {
   static PlayerNameRoute _fromState(GoRouterState state) => const PlayerNameRoute();
 
   String get location => GoRouteData.$location(
-        '/home/playerName',
+        "/home/playerName",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -84,7 +84,7 @@ extension $CreateGameRouteExtension on CreateGameRoute {
   static CreateGameRoute _fromState(GoRouterState state) => const CreateGameRoute();
 
   String get location => GoRouteData.$location(
-        '/home/create',
+        "/home/create",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -98,7 +98,7 @@ extension $JoinGameRouteExtension on JoinGameRoute {
   static JoinGameRoute _fromState(GoRouterState state) => const JoinGameRoute();
 
   String get location => GoRouteData.$location(
-        '/home/join',
+        "/home/join",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -109,11 +109,11 @@ extension $JoinGameRouteExtension on JoinGameRoute {
 }
 
 RouteBase get $lobbyMenuRoute => GoRouteData.$route(
-      path: '/lobby',
+      path: "/lobby",
       factory: $LobbyMenuRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: 'main',
+          path: "main",
           factory: $LobbyRouteExtension._fromState,
         ),
       ],
@@ -123,7 +123,7 @@ extension $LobbyMenuRouteExtension on LobbyMenuRoute {
   static LobbyMenuRoute _fromState(GoRouterState state) => const LobbyMenuRoute();
 
   String get location => GoRouteData.$location(
-        '/lobby',
+        "/lobby",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -137,7 +137,7 @@ extension $LobbyRouteExtension on LobbyRoute {
   static LobbyRoute _fromState(GoRouterState state) => const LobbyRoute();
 
   String get location => GoRouteData.$location(
-        '/lobby/main',
+        "/lobby/main",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -148,7 +148,7 @@ extension $LobbyRouteExtension on LobbyRoute {
 }
 
 RouteBase get $prepareGameRoute => GoRouteData.$route(
-      path: '/prepare',
+      path: "/prepare",
       factory: $PrepareGameRouteExtension._fromState,
     );
 
@@ -156,7 +156,7 @@ extension $PrepareGameRouteExtension on PrepareGameRoute {
   static PrepareGameRoute _fromState(GoRouterState state) => const PrepareGameRoute();
 
   String get location => GoRouteData.$location(
-        '/prepare',
+        "/prepare",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -167,11 +167,11 @@ extension $PrepareGameRouteExtension on PrepareGameRoute {
 }
 
 RouteBase get $gameMenuRoute => GoRouteData.$route(
-      path: '/game',
+      path: "/game",
       factory: $GameMenuRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: 'start',
+          path: "start",
           factory: $GameStartRouteExtension._fromState,
         ),
       ],
@@ -181,7 +181,7 @@ extension $GameMenuRouteExtension on GameMenuRoute {
   static GameMenuRoute _fromState(GoRouterState state) => const GameMenuRoute();
 
   String get location => GoRouteData.$location(
-        '/game',
+        "/game",
       );
 
   void go(BuildContext context) => context.go(location);
@@ -195,7 +195,7 @@ extension $GameStartRouteExtension on GameStartRoute {
   static GameStartRoute _fromState(GoRouterState state) => const GameStartRoute();
 
   String get location => GoRouteData.$location(
-        '/game/start',
+        "/game/start",
       );
 
   void go(BuildContext context) => context.go(location);

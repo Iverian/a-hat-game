@@ -1,6 +1,7 @@
 import "dart:async";
 import "dart:developer" as dev;
 
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:go_router/go_router.dart";
@@ -8,13 +9,17 @@ import "package:hooks_riverpod/hooks_riverpod.dart";
 
 import "../generated/proto/state.pb.dart";
 import "../util.dart";
-import 'full_screen_modal.dart';
+import "full_screen_modal.dart";
 
 class EditCharacterWidget extends HookConsumerWidget {
   final Character? initialValue;
   final void Function(Character) onSubmit;
 
-  const EditCharacterWidget({required this.initialValue, required this.onSubmit, super.key});
+  const EditCharacterWidget({
+    required this.initialValue,
+    required this.onSubmit,
+    super.key,
+  });
 
   static Future<void> modalRoute({
     required BuildContext context,
@@ -38,7 +43,9 @@ class EditCharacterWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
     final titleController = useTextEditingController.fromValue(
-      initialValue != null ? TextEditingValue(text: initialValue!.title) : TextEditingValue.empty,
+      initialValue != null
+          ? TextEditingValue(text: initialValue!.title)
+          : TextEditingValue.empty,
     );
     final descController = useTextEditingController.fromValue(
       initialValue != null
@@ -89,5 +96,23 @@ class EditCharacterWidget extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(
+        DiagnosticsProperty<Character?>(
+          "initialValue",
+          initialValue,
+        ),
+      )
+      ..add(
+        ObjectFlagProperty<void Function(Character p1)>.has(
+          "onSubmit",
+          onSubmit,
+        ),
+      );
   }
 }

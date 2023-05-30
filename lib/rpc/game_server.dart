@@ -48,23 +48,27 @@ class GameServer {
     try {
       switch (req.kind) {
         case _RequestKind.confirm:
-          response = await _confirm(req.data as _ConfirmData).then((value) => null);
+          response =
+              await _confirm(req.data as _ConfirmData).then((value) => null);
           break;
         case _RequestKind.subscribe:
-          response = await _subscribe(req.data as _SubscribeData).then((value) => null);
+          response = await _subscribe(req.data as _SubscribeData)
+              .then((value) => null);
           break;
         case _RequestKind.lobbyJoin:
           response = await _lobbyJoin(req.data as String);
           break;
         case _RequestKind.lobbyLeave:
-          response = await _lobbyLeave(req.data as PlayerMetadata).then((value) => null);
+          response = await _lobbyLeave(req.data as PlayerMetadata)
+              .then((value) => null);
           break;
         case _RequestKind.lobbyPlayerReady:
-          response =
-              await _lobbyPlayerReady(req.data as _LobbyPlayerReadyData).then((value) => null);
+          response = await _lobbyPlayerReady(req.data as _LobbyPlayerReadyData)
+              .then((value) => null);
           break;
         case _RequestKind.lobbyPlayerNotReady:
-          response = await _lobbyPlayerNotReady(req.data as PlayerMetadata).then((value) => null);
+          response = await _lobbyPlayerNotReady(req.data as PlayerMetadata)
+              .then((value) => null);
           break;
         case _RequestKind.gamePrepareStart:
           response = await _gamePrepareStart().then((value) => null);
@@ -73,13 +77,16 @@ class GameServer {
           response = await _gameStart().then((value) => null);
           break;
         case _RequestKind.startTurn:
-          response = await _startTurn(req.data as PlayerMetadata).then((value) => null);
+          response = await _startTurn(req.data as PlayerMetadata)
+              .then((value) => null);
           break;
         case _RequestKind.endTurn:
-          response = await _endTurn(req.data as _EndTurnData).then((value) => null);
+          response =
+              await _endTurn(req.data as _EndTurnData).then((value) => null);
           break;
         case _RequestKind.castVote:
-          response = await _castVote(req.data as _CastVoteData).then((value) => null);
+          response =
+              await _castVote(req.data as _CastVoteData).then((value) => null);
           break;
         case _RequestKind.countVotes:
           response = await _countVotes().then((value) => null);
@@ -98,7 +105,8 @@ class GameServer {
   }
 
   Future<void> _confirm(_ConfirmData data) async {
-    dev.log("received confirmation request (clientRev = ${data.rev}, serverRev = ${_state.rev})");
+    dev.log(
+        "received confirmation request (clientRev = ${data.rev}, serverRev = ${_state.rev})");
     if (data.rev != _state.rev) {
       throw InvalidStateRevisionError();
     }
@@ -130,7 +138,8 @@ class GameServer {
   }
 
   Future<void> _lobbyPlayerReady(_LobbyPlayerReadyData data) async {
-    await _notifyAllPatch(_state.updateLobbyPlayerReady(data.player.playerId, data.characters));
+    await _notifyAllPatch(
+        _state.updateLobbyPlayerReady(data.player.playerId, data.characters));
   }
 
   Future<void> _lobbyPlayerNotReady(PlayerMetadata data) async {
@@ -162,7 +171,8 @@ class GameServer {
   }
 
   Future<void> _castVote(_CastVoteData data) async {
-    await _notifyAllPatch(_state.updateCastVote(data.player.playerId, data.result));
+    await _notifyAllPatch(
+        _state.updateCastVote(data.player.playerId, data.result));
   }
 
   Future<void> _countVotes() async {
@@ -214,7 +224,8 @@ class GameServerClient {
     }
   }
 
-  Future<void> confirm({required PlayerMetadata player, required int rev}) async {
+  Future<void> confirm(
+      {required PlayerMetadata player, required int rev}) async {
     await _request(
       kind: _RequestKind.confirm,
       data: _ConfirmData(player: player, rev: rev),
@@ -359,7 +370,8 @@ class _EndTurnData {
   final TurnEndReason reason;
   final List<Int64> guessed;
 
-  _EndTurnData({required this.player, required this.reason, required this.guessed});
+  _EndTurnData(
+      {required this.player, required this.reason, required this.guessed});
 }
 
 class _CastVoteData {
@@ -381,7 +393,8 @@ class _Listeners {
         _barrier = _BarrierLock(),
         _confirmTimeout = confirmTimeout;
 
-  Future<void> add(int listenerId, SendPort Function() getListener) => _lock.protectWrite(() async {
+  Future<void> add(int listenerId, SendPort Function() getListener) =>
+      _lock.protectWrite(() async {
         _removeRaw(listenerId);
         _data[listenerId] = getListener();
       });
@@ -392,11 +405,15 @@ class _Listeners {
 
   Future<void> setReady(int listenerId) => _barrier.setReady(listenerId);
 
-  Future<void> notifyRewind(int listenerId, GameState state) => _lock.protectRead(() async {
+  Future<void> notifyRewind(int listenerId, GameState state) =>
+      _lock.protectRead(() async {
         _data[listenerId]?.send(GameEventExt.doRewind(state));
       });
 
-  Future<List<int>> notifyAllPatch(GameStatePatch patch, {bool forceNoConfirm = false}) =>
+  Future<List<int>> notifyAllPatch(
+    GameStatePatch patch, {
+    bool forceNoConfirm = false,
+  }) =>
       _lock.protectWrite(() async {
         final event = GameEventExt.doPatch(patch);
         _notifyAllRaw(event);
@@ -408,7 +425,7 @@ class _Listeners {
         final rx = ReceivePort();
         await _barrier.activate(rx.sendPort, _data.keys);
         try {
-          final _ = await rx.first;
+          final _ = await rx.first.timeout(_confirmTimeout);
           final notReady = await _barrier.deactivate();
           notReady.forEach(_removeRaw);
           _notifyAllRaw(GameEventExt.doAck());
@@ -480,17 +497,20 @@ class _Barrier {
   final SendPort tx;
   final Map<int, bool> data;
 
-  _Barrier(this.tx, Iterable<int> ids) : data = Map.fromEntries(ids.map((e) => MapEntry(e, false)));
+  _Barrier(this.tx, Iterable<int> ids)
+      : data = Map.fromEntries(ids.map((e) => MapEntry(e, false)));
 
   void setReady(int id) {
     if (!data.containsKey(id)) {
       return;
     }
     data[id] = true;
-    if (data.values.fold(true, (previousValue, element) => previousValue && element)) {
+    if (data.values
+        .fold(true, (previousValue, element) => previousValue && element)) {
       tx.send(true);
     }
   }
 
-  List<int> notReady() => data.entries.where((e) => !e.value).map((e) => e.key).toList();
+  List<int> notReady() =>
+      data.entries.where((e) => !e.value).map((e) => e.key).toList();
 }

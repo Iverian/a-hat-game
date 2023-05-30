@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 
 class MenuItem extends StatelessWidget {
@@ -35,5 +36,16 @@ class MenuItem extends StatelessWidget {
         onLongPress: onLongPress,
       ),
     );
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(StringProperty("title", title))
+      ..add(ObjectFlagProperty<void Function()?>.has("onTap", onTap))
+      ..add(
+          ObjectFlagProperty<void Function()?>.has("onLongPress", onLongPress),)
+      ..add(DiagnosticsProperty<bool>("enabled", enabled));
   }
 }

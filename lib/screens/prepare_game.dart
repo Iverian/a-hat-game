@@ -1,5 +1,6 @@
 import "dart:async";
 
+import "package:flutter/foundation.dart";
 import "package:flutter/material.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
 
@@ -19,7 +20,8 @@ class _PrepareGameScreenState extends ConsumerState<PrepareGameScreen> {
   @override
   void initState() {
     super.initState();
-    countdown = ref.read(gameProvider.select((value) => value.state.settings.startTimeoutS));
+    countdown = ref.read(
+        gameProvider.select((value) => value.state.settings.startTimeoutS),);
     timer = Timer.periodic(
       const Duration(seconds: 1),
       (timer) async {
@@ -46,4 +48,12 @@ class _PrepareGameScreenState extends ConsumerState<PrepareGameScreen> {
           ),
         ),
       );
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(IntProperty("countdown", countdown))
+      ..add(DiagnosticsProperty<Timer?>("timer", timer));
+  }
 }

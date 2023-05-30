@@ -112,9 +112,7 @@ class _ListenerLock {
 
   _ListenerLock() : _lock = Mutex();
 
-  Future<bool> isPresent() => _lock.protect(() async {
-        return _callback != null;
-      });
+  Future<bool> isPresent() => _lock.protect(() async => _callback != null);
 
   Future<void> add(VoidCallback callback) => _lock.protect(() async {
         _callback = callback;

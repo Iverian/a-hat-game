@@ -1,20 +1,20 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'router_notifier.dart';
+part of "router_notifier.dart";
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$routerNotifierHash() => r'00e5e2ddbee8775e9566556691ab0cca522c90dc';
+String _$routerNotifierHash() => r"00e5e2ddbee8775e9566556691ab0cca522c90dc";
 
 /// See also [RouterNotifier].
 @ProviderFor(RouterNotifier)
 final routerNotifierProvider = AutoDisposeAsyncNotifierProvider<RouterNotifier, void>.internal(
   RouterNotifier.new,
-  name: r'routerNotifierProvider',
+  name: r"routerNotifierProvider",
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$routerNotifierHash,
+      const bool.fromEnvironment("dart.vm.product") ? null : _$routerNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
